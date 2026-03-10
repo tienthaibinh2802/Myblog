@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-gradient-to-b from-rose-50 via-white to-sky-50 text-gray-700 body-font">
+  <div class="container px-5 py-20 mx-auto">
+    <div class="max-w-3xl mb-14">
+      <p class="tracking-[0.3em] text-xs uppercase text-pink-500 mb-3">Resource Archive</p>
+      <h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Kho tai lieu</h1>
+      <p class="text-base md:text-lg leading-8">
+        Tong hop tai lieu tieng Nhat, SRC game va cac danh muc khac. Ban co the cap nhat toan bo link trong trang admin.
+      </p>
+    </div>
+
+    <div class="space-y-10">
+      {% for section in sections %}
+      <article class="rounded-3xl border border-rose-100 bg-white/90 shadow-lg shadow-rose-100/50 overflow-hidden">
+        <div class="px-8 py-8 border-b border-rose-100 bg-gradient-to-r from-white via-rose-50 to-sky-50">
+          <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div>
+              <p class="text-sm uppercase tracking-[0.25em] text-pink-400">Danh muc</p>
+              <h2 class="text-3xl font-serif text-gray-900">{{ section.title }}</h2>
+            </div>
+            {% if section.description %}
+            <p class="max-w-2xl text-sm md:text-base leading-7 text-gray-600">{{ section.description }}</p>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="px-8 py-8">
+          <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {% for group in section.groups.all %}
+            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <div class="mb-5">
+                <h3 class="text-xl font-semibold text-gray-900">{{ group.title }}</h3>
+                {% if group.description %}
+                <p class="text-sm text-gray-500 mt-2 leading-6">{{ group.description }}</p>
+                {% endif %}
+              </div>
+
+              {% if group.links.all %}
+              <div class="space-y-3">
+                {% for link in group.links.all %}
+                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="flex items-start justify-between gap-4 rounded-xl bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:border-pink-300 hover:shadow-md border border-transparent">
+                  <div>
+                    <p class="font-medium text-gray-900">{{ link.title }}</p>
+                    {% if link.note %}
+                    <p class="text-sm text-gray-500 mt-1">{{ link.note }}</p>
+                    {% endif %}
+                  </div>
+                  <span class="text-pink-500 text-sm whitespace-nowrap">Mo link</span>
+                </a>
+                {% endfor %}
+              </div>
+              {% else %}
+              <div class="rounded-xl border border-dashed border-slate-300 px-4 py-5 text-sm text-gray-500">
+                Chua co link trong muc nay. Ban co the them trong admin.
+              </div>
+              {% endif %}
+            </div>
+            {% empty %}
+            <div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-slate-300 px-6 py-8 text-gray-500 bg-slate-50">
+              Chua co nhom tai lieu. Hay vao admin de them nhom va link.
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </article>
+      {% empty %}
+      <div class="rounded-3xl border border-dashed border-slate-300 bg-white px-8 py-12 text-center text-gray-500">
+        Chua co du lieu tai lieu. Hay vao admin de khoi tao noi dung.
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock content %}

@@ -1,6 +1,26 @@
-from django.shortcuts import render
+from functools import wraps
+
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q 
-from .models import Category, Post, Author
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import AdminLoginForm, ResourceGroupForm, ResourceLinkForm, ResourceSectionForm
+from .models import Category, Post, Author, ResourceGroup, ResourceLink, ResourceSection
+
+
+def staff_required(view_func):
+    @wraps(view_func)
+    @login_required(login_url="resource_admin_login")
+    @user_passes_test(
+        lambda user: user.is_staff or user.is_superuser,
+        login_url="resource_admin_login",
+    )
+    def _wrapped_view(request, *args, **kwargs):
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped_view
 
 def get_author(user):
     qs = Author.objects.filter(user=user)
@@ -62,3 +82,202 @@ def allposts(request):
         'posts': posts,
     }
     return render(request, 'all_posts.html', context)
+
+
+def resource_library(request):
+    sections = ResourceSection.objects.prefetch_related('groups__links')
+    context = {
+        'sections': sections,
+    }
+    return render(request, 'resource_library.html', context)
+
+
+class ResourceAdminLoginView(LoginView):
+    template_name = "resource_admin/login.html"
+    authentication_form = AdminLoginForm
+    redirect_authenticated_user = True
+
+    def get_success_url(self):
+        return "/sql/"
+
+
+class ResourceAdminLogoutView(LogoutView):
+    next_page = "/sql/dang-nhap/"
+
+
+@staff_required
+def resource_admin_dashboard(request):
+    sections = ResourceSection.objects.prefetch_related("groups__links")
+    context = {
+        "sections": sections,
+        "section_count": ResourceSection.objects.count(),
+        "group_count": ResourceGroup.objects.count(),
+        "link_count": ResourceLink.objects.count(),
+    }
+    return render(request, "resource_admin/dashboard.html", context)
+
+
+@staff_required
+def resource_admin_database(request):
+    sections = ResourceSection.objects.prefetch_related("groups__links")
+    groups = ResourceGroup.objects.select_related("section")
+    links = ResourceLink.objects.select_related("group", "group__section")
+    categories = Category.objects.all()
+    posts = Post.objects.select_related("author").prefetch_related("categories").order_by("-timestamp")
+    context = {
+        "sections": sections,
+        "groups": groups,
+        "links": links,
+        "categories": categories,
+        "posts": posts,
+    }
+    return render(request, "resource_admin/database.html", context)
+
+
+@staff_required
+def resource_section_create(request):
+    form = ResourceSectionForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Section created successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/section_form.html",
+        {"form": form, "page_title": "Create section"},
+    )
+
+
+@staff_required
+def resource_section_update(request, pk):
+    section = get_object_or_404(ResourceSection, pk=pk)
+    form = ResourceSectionForm(request.POST or None, instance=section)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Section updated successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/section_form.html",
+        {"form": form, "page_title": f"Edit section: {section.title}", "section": section},
+    )
+
+
+@staff_required
+def resource_section_delete(request, pk):
+    section = get_object_or_404(ResourceSection, pk=pk)
+    if request.method == "POST":
+        section.delete()
+        messages.success(request, "Section deleted successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/confirm_delete.html",
+        {
+            "object_name": section.title,
+            "cancel_url": "/sql/",
+            "page_title": "Delete section",
+        },
+    )
+
+
+@staff_required
+def resource_group_create(request):
+    initial = {}
+    section_id = request.GET.get("section")
+    if section_id:
+        initial["section"] = section_id
+    form = ResourceGroupForm(request.POST or None, initial=initial)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Group created successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/group_form.html",
+        {"form": form, "page_title": "Create group"},
+    )
+
+
+@staff_required
+def resource_group_update(request, pk):
+    group = get_object_or_404(ResourceGroup, pk=pk)
+    form = ResourceGroupForm(request.POST or None, instance=group)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Group updated successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/group_form.html",
+        {"form": form, "page_title": f"Edit group: {group.title}", "group": group},
+    )
+
+
+@staff_required
+def resource_group_delete(request, pk):
+    group = get_object_or_404(ResourceGroup, pk=pk)
+    if request.method == "POST":
+        group.delete()
+        messages.success(request, "Group deleted successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/confirm_delete.html",
+        {
+            "object_name": group.title,
+            "cancel_url": "/sql/",
+            "page_title": "Delete group",
+        },
+    )
+
+
+@staff_required
+def resource_link_create(request):
+    initial = {}
+    group_id = request.GET.get("group")
+    if group_id:
+        initial["group"] = group_id
+    form = ResourceLinkForm(request.POST or None, initial=initial)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Link created successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/link_form.html",
+        {"form": form, "page_title": "Create link"},
+    )
+
+
+@staff_required
+def resource_link_update(request, pk):
+    link = get_object_or_404(ResourceLink, pk=pk)
+    form = ResourceLinkForm(request.POST or None, instance=link)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Link updated successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/link_form.html",
+        {"form": form, "page_title": f"Edit link: {link.title}", "link": link},
+    )
+
+
+@staff_required
+def resource_link_delete(request, pk):
+    link = get_object_or_404(ResourceLink, pk=pk)
+    if request.method == "POST":
+        link.delete()
+        messages.success(request, "Link deleted successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/confirm_delete.html",
+        {
+            "object_name": link.title,
+            "cancel_url": "/sql/",
+            "page_title": "Delete link",
+        },
+    )

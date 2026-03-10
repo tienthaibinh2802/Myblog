@@ -1,0 +1,19 @@
+{% extends 'resource_admin/base.html' %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<section class="mx-auto max-w-2xl rounded-[2rem] bg-white p-8 shadow-sm">
+  <p class="text-sm uppercase tracking-[0.25em] text-rose-400">Delete</p>
+  <h1 class="mt-2 text-3xl font-semibold text-slate-900">{{ page_title }}</h1>
+  <p class="mt-4 text-base leading-8 text-slate-600">
+    Are you sure you want to delete <strong>{{ object_name }}</strong>? This action will remove related data inside it.
+  </p>
+
+  <form method="post" class="mt-8 flex flex-wrap gap-3">
+    {% csrf_token %}
+    <button type="submit" class="rounded-full bg-rose-500 px-5 py-3 text-sm font-medium text-white hover:bg-rose-400">Delete</button>
+    <a href="{{ cancel_url }}" class="rounded-full border border-slate-300 px-5 py-3 text-sm hover:bg-slate-50">Cancel</a>
+  </form>
+</section>
+{% endblock content %}

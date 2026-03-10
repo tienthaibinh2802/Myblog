@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -30,6 +31,60 @@ class Post(models.Model):
     thumbnail = models.ImageField()
     categories = models.ManyToManyField(Category)
     featured = models.BooleanField()
+
+    def __str__(self):
+        return self.title
+
+
+class ResourceSection(models.Model):
+    title = models.CharField(max_length=100)
+    slug = models.SlugField(unique=True)
+    description = models.TextField(blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "title"]
+
+    def __str__(self):
+        return self.title
+
+
+class ResourceGroup(models.Model):
+    section = models.ForeignKey(
+        ResourceSection,
+        on_delete=models.CASCADE,
+        related_name="groups",
+    )
+    title = models.CharField(max_length=100)
+    description = models.TextField(blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "title"]
+        unique_together = ("section", "title")
+
+    def __str__(self):
+        return f"{self.section.title} - {self.title}"
+
+
+class ResourceLink(models.Model):
+    group = models.ForeignKey(
+        ResourceGroup,
+        on_delete=models.CASCADE,
+        related_name="links",
+    )
+    title = models.CharField(max_length=150)
+    url = models.URLField()
+    note = models.CharField(max_length=255, blank=True)
+    display_order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["display_order", "title"]
+        unique_together = ("group", "title")
+
+    def clean(self):
+        if self.url and not self.url.startswith(("http://", "https://")):
+            raise ValidationError({"url": "Link phai bat dau bang http:// hoac https://"})
 
     def __str__(self):
         return self.title

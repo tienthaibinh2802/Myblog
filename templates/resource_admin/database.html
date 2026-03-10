@@ -1,0 +1,179 @@
+{% extends 'resource_admin/base.html' %}
+
+{% block title %}Database{% endblock title %}
+
+{% block content %}
+<section class="mb-8 rounded-[2rem] bg-white p-8 shadow-sm">
+  <p class="text-sm uppercase tracking-[0.25em] text-slate-400">Database viewer</p>
+  <h1 class="mt-2 text-3xl font-semibold text-slate-900">Database viewer</h1>
+  <p class="mt-3 max-w-3xl text-sm leading-7 text-slate-500">
+    This page shows the current data in the system, so you can review everything without opening the SQL file.
+  </p>
+</section>
+
+<section class="space-y-8">
+  <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-8 py-5">
+      <h2 class="text-2xl font-semibold text-slate-900">Resource Section</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-500">
+          <tr>
+            <th class="px-6 py-4">ID</th>
+            <th class="px-6 py-4">Title</th>
+            <th class="px-6 py-4">Slug</th>
+            <th class="px-6 py-4">Order</th>
+            <th class="px-6 py-4">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for section in sections %}
+          <tr class="border-t border-slate-100">
+            <td class="px-6 py-4">{{ section.id }}</td>
+            <td class="px-6 py-4 font-medium text-slate-900">{{ section.title }}</td>
+            <td class="px-6 py-4">{{ section.slug }}</td>
+            <td class="px-6 py-4">{{ section.display_order }}</td>
+            <td class="px-6 py-4">{{ section.description|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-8 py-5">
+      <h2 class="text-2xl font-semibold text-slate-900">Resource Group</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-500">
+          <tr>
+            <th class="px-6 py-4">ID</th>
+            <th class="px-6 py-4">Section</th>
+            <th class="px-6 py-4">Title</th>
+            <th class="px-6 py-4">Order</th>
+            <th class="px-6 py-4">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for group in groups %}
+          <tr class="border-t border-slate-100">
+            <td class="px-6 py-4">{{ group.id }}</td>
+            <td class="px-6 py-4">{{ group.section.title }}</td>
+            <td class="px-6 py-4 font-medium text-slate-900">{{ group.title }}</td>
+            <td class="px-6 py-4">{{ group.display_order }}</td>
+            <td class="px-6 py-4">{{ group.description|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-8 py-5">
+      <h2 class="text-2xl font-semibold text-slate-900">Resource Link</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-500">
+          <tr>
+            <th class="px-6 py-4">ID</th>
+            <th class="px-6 py-4">Section</th>
+            <th class="px-6 py-4">Group</th>
+            <th class="px-6 py-4">Title</th>
+            <th class="px-6 py-4">URL</th>
+            <th class="px-6 py-4">Note</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for link in links %}
+          <tr class="border-t border-slate-100 align-top">
+            <td class="px-6 py-4">{{ link.id }}</td>
+            <td class="px-6 py-4">{{ link.group.section.title }}</td>
+            <td class="px-6 py-4">{{ link.group.title }}</td>
+            <td class="px-6 py-4 font-medium text-slate-900">{{ link.title }}</td>
+            <td class="px-6 py-4 break-all">
+              <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="text-sky-600 hover:underline">{{ link.url }}</a>
+            </td>
+            <td class="px-6 py-4">{{ link.note|default:"-" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-8 py-5">
+      <h2 class="text-2xl font-semibold text-slate-900">Category</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-500">
+          <tr>
+            <th class="px-6 py-4">ID</th>
+            <th class="px-6 py-4">Title</th>
+            <th class="px-6 py-4">Subtitle</th>
+            <th class="px-6 py-4">Slug</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for category in categories %}
+          <tr class="border-t border-slate-100">
+            <td class="px-6 py-4">{{ category.id }}</td>
+            <td class="px-6 py-4 font-medium text-slate-900">{{ category.title }}</td>
+            <td class="px-6 py-4">{{ category.subtitle }}</td>
+            <td class="px-6 py-4">{{ category.slug }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+
+  <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-8 py-5">
+      <h2 class="text-2xl font-semibold text-slate-900">Post</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-500">
+          <tr>
+            <th class="px-6 py-4">ID</th>
+            <th class="px-6 py-4">Title</th>
+            <th class="px-6 py-4">Slug</th>
+            <th class="px-6 py-4">Author</th>
+            <th class="px-6 py-4">Featured</th>
+            <th class="px-6 py-4">Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for post in posts %}
+          <tr class="border-t border-slate-100 align-top">
+            <td class="px-6 py-4">{{ post.id }}</td>
+            <td class="px-6 py-4 font-medium text-slate-900">{{ post.title }}</td>
+            <td class="px-6 py-4">{{ post.slug }}</td>
+            <td class="px-6 py-4">{{ post.author }}</td>
+            <td class="px-6 py-4">{% if post.featured %}Yes{% else %}No{% endif %}</td>
+            <td class="px-6 py-4">{{ post.timestamp }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="6" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
+{% endblock content %}

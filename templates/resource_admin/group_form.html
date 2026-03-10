@@ -1,0 +1,30 @@
+{% extends 'resource_admin/base.html' %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<section class="mx-auto max-w-3xl rounded-[2rem] bg-white p-8 shadow-sm">
+  <div class="mb-8">
+    <p class="text-sm uppercase tracking-[0.25em] text-slate-400">Resource Group</p>
+    <h1 class="mt-2 text-3xl font-semibold text-slate-900">{{ page_title }}</h1>
+  </div>
+
+  <form method="post" class="space-y-6">
+    {% csrf_token %}
+    {% for field in form %}
+    <div>
+      <label for="{{ field.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-600">{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}
+      <div class="mt-2 text-sm text-rose-600">{{ field.errors }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <div class="flex flex-wrap gap-3">
+      <button type="submit" class="rounded-full bg-rose-500 px-5 py-3 text-sm font-medium text-white hover:bg-rose-400">Save group</button>
+      <a href="{% url 'resource_admin_dashboard' %}" class="rounded-full border border-slate-300 px-5 py-3 text-sm hover:bg-slate-50">Back</a>
+    </div>
+  </form>
+</section>
+{% endblock content %}

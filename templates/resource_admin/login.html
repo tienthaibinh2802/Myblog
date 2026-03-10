@@ -1,0 +1,48 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Login</title>
+  </head>
+  <body class="min-h-screen bg-[radial-gradient(circle_at_top,_#ffe4e6,_#f8fafc_55%,_#e0f2fe)]">
+    <div class="mx-auto flex min-h-screen max-w-6xl items-center px-6 py-12">
+      <div class="grid w-full gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+        <section class="rounded-[2rem] bg-slate-900 p-10 text-white shadow-2xl shadow-slate-300/50">
+          <p class="mb-4 text-sm uppercase tracking-[0.35em] text-rose-300">Private Workspace</p>
+          <h1 class="mb-6 text-4xl font-semibold leading-tight">Login to resource manager</h1>
+          <p class="max-w-2xl text-base leading-8 text-slate-300">
+            This private area helps you manage Japanese resources, SRC Game, and Travel links without using Django admin.
+          </p>
+        </section>
+
+        <section class="rounded-[2rem] border border-white/70 bg-white/90 p-8 shadow-xl shadow-rose-100/60 backdrop-blur">
+          <h2 class="mb-6 text-2xl font-semibold text-slate-900">Login</h2>
+          <form method="post" class="space-y-5">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-600">
+              {{ form.non_field_errors }}
+            </div>
+            {% endif %}
+
+            <div>
+              <label for="{{ form.username.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-600">{{ form.username.label }}</label>
+              {{ form.username }}
+            </div>
+
+            <div>
+              <label for="{{ form.password.id_for_label }}" class="mb-2 block text-sm font-medium text-slate-600">{{ form.password.label }}</label>
+              {{ form.password }}
+            </div>
+
+            <button type="submit" class="w-full rounded-xl bg-slate-900 px-4 py-3 font-medium text-white transition hover:bg-slate-700">
+              Login
+            </button>
+          </form>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>
