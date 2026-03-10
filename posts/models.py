@@ -74,7 +74,8 @@ class ResourceLink(models.Model):
         related_name="links",
     )
     title = models.CharField(max_length=150)
-    url = models.URLField()
+    url = models.URLField(blank=True)
+    document = models.FileField(upload_to="resources/files/", blank=True)
     note = models.CharField(max_length=255, blank=True)
     display_order = models.PositiveIntegerField(default=0)
 
@@ -83,6 +84,8 @@ class ResourceLink(models.Model):
         unique_together = ("group", "title")
 
     def clean(self):
+        if not self.url and not self.document:
+            raise ValidationError("Please provide either a URL or an uploaded file.")
         if self.url and not self.url.startswith(("http://", "https://")):
             raise ValidationError({"url": "Link phai bat dau bang http:// hoac https://"})
 

@@ -5,9 +5,9 @@
   <div class="container px-5 py-20 mx-auto">
     <div class="max-w-3xl mb-14">
       <p class="tracking-[0.3em] text-xs uppercase text-pink-500 mb-3">Resource Archive</p>
-      <h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Kho tai lieu</h1>
+      <h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Resource Library</h1>
       <p class="text-base md:text-lg leading-8">
-        Tong hop tai lieu tieng Nhat, SRC game va cac danh muc khac. Ban co the cap nhat toan bo link trong trang admin.
+        A central place for Japanese study materials, SRC game references, and travel resources.
       </p>
     </div>
 
@@ -17,7 +17,7 @@
         <div class="px-8 py-8 border-b border-rose-100 bg-gradient-to-r from-white via-rose-50 to-sky-50">
           <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p class="text-sm uppercase tracking-[0.25em] text-pink-400">Danh muc</p>
+              <p class="text-sm uppercase tracking-[0.25em] text-pink-400">Section</p>
               <h2 class="text-3xl font-serif text-gray-900">{{ section.title }}</h2>
             </div>
             {% if section.description %}
@@ -40,26 +40,42 @@
               {% if group.links.all %}
               <div class="space-y-3">
                 {% for link in group.links.all %}
+                {% if link.url %}
                 <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="flex items-start justify-between gap-4 rounded-xl bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:border-pink-300 hover:shadow-md border border-transparent">
                   <div>
                     <p class="font-medium text-gray-900">{{ link.title }}</p>
                     {% if link.note %}
                     <p class="text-sm text-gray-500 mt-1">{{ link.note }}</p>
                     {% endif %}
+                    {% if link.document %}
+                    <p class="text-sm text-sky-600 mt-1">Attached file: {{ link.document.name|cut:"resources/files/" }}</p>
+                    {% endif %}
                   </div>
-                  <span class="text-pink-500 text-sm whitespace-nowrap">Mo link</span>
+                  <span class="text-pink-500 text-sm whitespace-nowrap">Open</span>
                 </a>
+                {% elif link.document %}
+                <a href="{{ link.document.url }}" target="_blank" rel="noopener noreferrer" class="flex items-start justify-between gap-4 rounded-xl bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:border-pink-300 hover:shadow-md border border-transparent">
+                  <div>
+                    <p class="font-medium text-gray-900">{{ link.title }}</p>
+                    <p class="text-sm text-sky-600 mt-1">File: {{ link.document.name|cut:"resources/files/" }}</p>
+                    {% if link.note %}
+                    <p class="text-sm text-gray-500 mt-1">{{ link.note }}</p>
+                    {% endif %}
+                  </div>
+                  <span class="text-pink-500 text-sm whitespace-nowrap">Download</span>
+                </a>
+                {% endif %}
                 {% endfor %}
               </div>
               {% else %}
               <div class="rounded-xl border border-dashed border-slate-300 px-4 py-5 text-sm text-gray-500">
-                Chua co link trong muc nay. Ban co the them trong admin.
+                No resources in this group yet.
               </div>
               {% endif %}
             </div>
             {% empty %}
             <div class="md:col-span-2 xl:col-span-3 rounded-2xl border border-dashed border-slate-300 px-6 py-8 text-gray-500 bg-slate-50">
-              Chua co nhom tai lieu. Hay vao admin de them nhom va link.
+              No groups found in this section yet.
             </div>
             {% endfor %}
           </div>
@@ -67,7 +83,7 @@
       </article>
       {% empty %}
       <div class="rounded-3xl border border-dashed border-slate-300 bg-white px-8 py-12 text-center text-gray-500">
-        Chua co du lieu tai lieu. Hay vao admin de khoi tao noi dung.
+        No resource data yet.
       </div>
       {% endfor %}
     </div>

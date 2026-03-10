@@ -1,129 +1,151 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<section class="relative overflow-hidden bg-[linear-gradient(135deg,_#fff8fb_0%,_#fff_42%,_#f4fbff_100%)]">
+  <div class="absolute inset-0 opacity-70">
+    <div class="absolute -left-20 top-10 h-72 w-72 rounded-full bg-pink-200/50 blur-3xl"></div>
+    <div class="absolute right-0 top-0 h-80 w-80 rounded-full bg-sky-200/50 blur-3xl"></div>
+    <div class="absolute bottom-0 left-1/3 h-52 w-52 rounded-full bg-rose-100 blur-3xl"></div>
+  </div>
 
-<style>
-  .cursor::after {
-  display: block;
-  content: '';
-  position: absolute;
-  width: 4px;
-  height: 100%;
-  background-color: #fff;
-  animation: cursor .6s linear infinite alternate;
-  will-change: opacity;
-}
-
-@keyframes cursor {
-  0%, 40% {
-    opacity: 1;
-  }
-
-  60%, 100% {
-    opacity: 0;
-  }
-}
-</style>
-
-
-    <div class="w-full bg-cover bg-center" >
-      <div class="py-5 flex items-center justify-center h-full w-full">
-        <!-- <h2 class="tracking-widest text-9xl title-font font-serif text-white mb-1">
-          MY BLOG
-        </h2> -->
-        <h1 class="mb-6 font-mono text-4xl text-pink-500 md:text-6xl">
-          {% comment %} ❤️My BLOG <br class="block md:hidden" /> {% endcomment %}
-          <span class="relative">
-            <span class="h-15 pt-2 overflow-x-hidden whitespace-nowrap text-brand-accent">
-            ❤️TIEN REUS❤️
-            </span>
-            <span
-              class="cursor absolute -bottom-0 left-0 -top-1 inline-block bg-white w-full animate-type will-change"
-            ></span>
-          </span>
+  <div class="relative container mx-auto px-5 py-16 md:py-24">
+    <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+      <div>
+        <p class="mb-4 inline-flex rounded-full border border-pink-200 bg-white/80 px-4 py-2 text-xs uppercase tracking-[0.3em] text-pink-500 shadow-sm">
+          Personal Blog + Resource Hub
+        </p>
+        <h1 class="max-w-3xl text-5xl font-semibold leading-tight text-slate-900 md:text-7xl">
+          Learn, collect, and organize everything in one place.
         </h1>
+        <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+          A clean space for blog posts, Japanese study materials, SRC game links, and travel references. Built to be simple to read and easy to manage.
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="{% url 'resource_library' %}" class="rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-700">
+            Explore Resources
+          </a>
+          <a href="{% url 'allposts' %}" class="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+            Read Articles
+          </a>
+        </div>
+
+        <div class="mt-12 grid gap-4 sm:grid-cols-3">
+          <div class="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-lg shadow-pink-100/40 backdrop-blur">
+            <p class="text-sm text-slate-500">Categories</p>
+            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ categories|length }}</p>
+          </div>
+          <div class="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-lg shadow-pink-100/40 backdrop-blur">
+            <p class="text-sm text-slate-500">Featured</p>
+            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ object_list|length }}</p>
+          </div>
+          <div class="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-lg shadow-pink-100/40 backdrop-blur">
+            <p class="text-sm text-slate-500">Resources</p>
+            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ resource_sections|length }}</p>
+          </div>
+        </div>
       </div>
-    </div>  
-    <section class="text-gray-600 body-font ">
-        <div class="container px-5 py-24 mx-auto">
-          <div class="flex flex-wrap -m-4">
-            {% for category in categories %}
-            <div class="p-4 lg:w-1/3">
-              <div class="transition ease-in-out delay-150 bg-blue-500 hover:-translate-y-1 hover:scale-110 hover:bg-indigo-500 duration-300 w-full bg-cover bg-center bg-gray-300 rounded-lg " style="background-image: url('{{ category.thumbnail.url }}')">
-                <div class="h-full bg-white-900 bg-opacity-40 hover:bg-opacity-70 transition duration-300 ease-in-out px-8 pt-16 pb-24 rounded-lg overflow-hidden text-center relative">
-                <h2 class="tracking-widest text-1xl title-font font-serif text-black-800 mb-1">
-                  CATEGORY</h2>
-                <h1 class="title-font sm:text-2xl text-xl font-serif text-gray-900 mb-3">
-                  {{ category.title }}</h1>
-                <p class="leading-relaxed mb-3">
-                  {{ category.subtitle }}</p>
-                <a href="{% url 'postlist' category.slug %}" class="rounded-lg hover:bg-pink-200 text-pink-500 inline-flex items-center">
-                  Posts
-                  <svg class="w-4 h-4 ml-2" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M5 12h14"></path>
-                    <path d="M12 5l7 7-7 7"></path>
-                  </svg>
-                </a>
-                
-              </div>
-              </div>
-              
+
+      <div class="relative">
+        <div class="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-2xl shadow-pink-100/50 backdrop-blur">
+          <div class="mb-6 flex items-center justify-between">
+            <div>
+              <p class="text-xs uppercase tracking-[0.25em] text-pink-400">Featured topics</p>
+              <h2 class="mt-2 text-2xl font-semibold text-slate-900">Start from what matters most</h2>
             </div>
+            <div class="rounded-full bg-pink-100 px-4 py-2 text-xs font-medium text-pink-500">Updated</div>
+          </div>
+
+          <div class="space-y-4">
+            {% for category in categories %}
+            <a href="{% url 'postlist' category.slug %}" class="group flex items-center gap-4 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:-translate-y-0.5 hover:border-pink-200 hover:bg-white hover:shadow-md">
+              <img src="{{ category.thumbnail.url }}" alt="{{ category.title }}" class="h-20 w-20 rounded-2xl object-cover">
+              <div class="flex-1">
+                <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Category</p>
+                <h3 class="mt-1 text-lg font-semibold text-slate-900">{{ category.title }}</h3>
+                <p class="mt-1 text-sm text-slate-500">{{ category.subtitle }}</p>
+              </div>
+              <span class="text-sm font-medium text-pink-500 transition group-hover:translate-x-1">Open</span>
+            </a>
             {% endfor %}
           </div>
         </div>
-    </section>
-    <!-- component -->
-<style>
-  .w-70 {
-    width: 20rem;
-	}
-</style>
-<section class="blog text-gray-700 body-font">
-      <div class="container px-5 py-24 mx-auto">
-        <div class="flex flex-wrap w-full mb-20 flex-col items-center text-center">
-          <h1 class="sm:text-3xl text-2xl font-medium title-font mb-2 text-gray-900 underline underline-offset-4"> 
-            Recent Posts</h1>
-          <p class="lg:w-1/2 w-full leading-relaxed text-base">
-            These are the most recently added posts</p>
-        </div>
-        <div class="flex flex-wrap sm:-m-4 -mx-4 -mb-10 -mt-4">
-          {% for obj in object_list %}
-          <div class="p-4 md:w-1/3 md:mb-0 mb-6 flex flex-col justify-center items-center max-w-sm mx-auto">
-            <div class="bg-gray-300 h-56 w-full rounded-lg shadow-md bg-cover bg-center" 
-            style="background-image: url('{{ obj.thumbnail.url }}')">
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-white">
+  <div class="container mx-auto px-5 py-20">
+    <div class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-sm uppercase tracking-[0.25em] text-pink-400">Latest Writing</p>
+        <h2 class="mt-2 text-4xl font-semibold text-slate-900">Recent posts</h2>
+      </div>
+      <a href="{% url 'allposts' %}" class="text-sm font-medium text-slate-600 hover:text-pink-500">View all posts</a>
+    </div>
+
+    <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {% for post in latest %}
+      <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/60">
+        <a href="{% url 'post' post.slug %}" class="block">
+          <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}" class="h-60 w-full object-cover">
+        </a>
+        <div class="p-6">
+          <div class="mb-4 flex flex-wrap gap-2">
+            {% for category in post.categories.all %}
+            <span class="rounded-full bg-pink-50 px-3 py-1 text-xs font-medium text-pink-500">{{ category.title }}</span>
+            {% endfor %}
           </div>
+          <h3 class="text-2xl font-semibold text-slate-900">{{ post.title }}</h3>
+          <p class="mt-3 line-clamp-3 text-sm leading-7 text-slate-500">{{ post.overview }}</p>
+          <div class="mt-6 flex items-center justify-between">
+            <p class="text-xs uppercase tracking-[0.2em] text-slate-400">{{ post.timestamp|date:"M d, Y" }}</p>
+            <a href="{% url 'post' post.slug %}" class="text-sm font-medium text-pink-500 hover:text-pink-600">Read more</a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
 
-            <div class=" w-70 bg-white -mt-10 shadow-lg rounded-lg overflow-hidden p-5">
-              
-              <div class="header-content inline-flex ">
-                <div class="category-badge flex-1  h-4 w-4 m rounded-full m-1 bg-purple-100">
-                  <div class="h-2 w-2 rounded-full m-1 bg-pink-500 " ></div>
-                </div>
-                {% for category in obj.categories.all %}
-                <div class="category-title flex-1 text-sm"> 
-                  {{ category.title }}
-                </div>
-                {% endfor %}
-              </div>
-                <div class="title-post font-medium">
-                {{ obj.title }}
-                </div>
+<section class="bg-slate-50">
+  <div class="container mx-auto px-5 py-20">
+    <div class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+      <div>
+        <p class="text-sm uppercase tracking-[0.25em] text-sky-500">Library Preview</p>
+        <h2 class="mt-2 text-4xl font-semibold text-slate-900">Organized resources</h2>
+      </div>
+      <a href="{% url 'resource_library' %}" class="text-sm font-medium text-slate-600 hover:text-sky-500">Open full library</a>
+    </div>
 
-                <div class="summary-post text-base text-justify">
-                  {{ obj.overview }}
-                </div>
-                
-                <div class="mt-3">
-                <a href="{% url 'post' obj.slug %}" class="bg-blue-100 text-pink-500 rounded p-2 text-sm ">
-                  Read more
-                </a>
-              </div>
+    <div class="grid gap-6 lg:grid-cols-3">
+      {% for section in resource_sections %}
+      <article class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
+        <div class="mb-5">
+          <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Resource section</p>
+          <h3 class="mt-2 text-2xl font-semibold text-slate-900">{{ section.title }}</h3>
+          {% if section.description %}
+          <p class="mt-3 text-sm leading-7 text-slate-500">{{ section.description }}</p>
+          {% endif %}
+        </div>
 
-            </div>
+        <div class="space-y-3">
+          {% for group in section.groups.all|slice:":4" %}
+          <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
+            <span class="font-medium text-slate-700">{{ group.title }}</span>
+            <span class="text-xs uppercase tracking-[0.15em] text-slate-400">{{ group.links.count }} items</span>
+          </div>
+          {% empty %}
+          <div class="rounded-2xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">
+            No groups available yet.
           </div>
           {% endfor %}
         </div>
-      </div>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
 </section>
 {% endblock content %}
