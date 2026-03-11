@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
-from .models import Author, Category, Post, ResourceGroup, ResourceLink, ResourceSection
+from .models import Author, Category, Comment, Post, ResourceGroup, ResourceLink, ResourceSection
 
 
 class AdminLoginForm(AuthenticationForm):
@@ -85,4 +85,24 @@ class PostForm(forms.ModelForm):
             "content": forms.Textarea(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3 min-h-[240px]"}),
             "thumbnail": forms.ClearableFileInput(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
             "featured": forms.CheckboxInput(attrs={"class": "h-5 w-5 rounded border-slate-300 text-pink-500 focus:ring-pink-500"}),
+        }
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["author_name", "body"]
+        widgets = {
+            "author_name": forms.TextInput(
+                attrs={
+                    "class": "w-full rounded-xl border border-rose-200 px-4 py-3",
+                    "placeholder": "Ten cua ban",
+                }
+            ),
+            "body": forms.Textarea(
+                attrs={
+                    "class": "w-full rounded-xl border border-rose-200 px-4 py-3 min-h-[110px]",
+                    "placeholder": "Viet comment o day...",
+                }
+            ),
         }

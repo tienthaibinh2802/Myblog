@@ -33,13 +33,66 @@
     }
   </script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    .flower-overlay {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      z-index: 40;
+    }
+    .flower-petal {
+      position: absolute;
+      top: -8vh;
+      width: var(--size);
+      height: calc(var(--size) * 0.7);
+      border-radius: 70% 30% 65% 35%;
+      opacity: 0.85;
+      background: linear-gradient(135deg, #ffd7ea 0%, #ff99c8 100%);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+      animation: flower-fall var(--dur) linear infinite;
+      animation-delay: var(--delay);
+    }
+    @keyframes flower-fall {
+      0% {
+        transform: translate3d(0, -10vh, 0) rotate(0deg);
+      }
+      100% {
+        transform: translate3d(var(--drift), 115vh, 0) rotate(540deg);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .flower-overlay {
+        display: none;
+      }
+    }
+  </style>
   </head>
   <body>
+    <div class="flower-overlay" id="flowerOverlay" aria-hidden="true"></div>
     {% include "navbar.html" %}
     {% block content %}
     {% endblock content %}
     {% include "footer.html" %}
   <!-- <img src='{% static "img/dummy.jpg" %}'/> -->
+  <script>
+    (function () {
+      const overlay = document.getElementById("flowerOverlay");
+      if (!overlay || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+      const count = window.innerWidth < 768 ? 12 : 20;
+      for (let i = 0; i < count; i += 1) {
+        const petal = document.createElement("span");
+        petal.className = "flower-petal";
+        petal.style.left = `${Math.random() * 100}%`;
+        petal.style.setProperty("--size", `${8 + Math.random() * 12}px`);
+        petal.style.setProperty("--dur", `${8 + Math.random() * 9}s`);
+        petal.style.setProperty("--delay", `${-Math.random() * 12}s`);
+        petal.style.setProperty("--drift", `${-80 + Math.random() * 160}px`);
+        overlay.appendChild(petal);
+      }
+    })();
+  </script>
   </body>
 </html>
 

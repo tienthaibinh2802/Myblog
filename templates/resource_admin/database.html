@@ -201,5 +201,37 @@
       </table>
     </div>
   </article>
+
+  <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-200 px-8 py-5">
+      <h2 class="text-2xl font-semibold text-slate-900">Comment</h2>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="min-w-full text-left text-sm">
+        <thead class="bg-slate-50 text-slate-500">
+          <tr>
+            <th class="px-6 py-4">ID</th>
+            <th class="px-6 py-4">Post</th>
+            <th class="px-6 py-4">Author name</th>
+            <th class="px-6 py-4">Body</th>
+            <th class="px-6 py-4">Created at</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for comment in comments %}
+          <tr class="border-t border-slate-100 align-top">
+            <td class="px-6 py-4">{{ comment.id }}</td>
+            <td class="px-6 py-4 font-medium text-slate-900">{{ comment.post.title }}</td>
+            <td class="px-6 py-4">{{ comment.author_name }}</td>
+            <td class="px-6 py-4">{{ comment.body|truncatechars:160 }}</td>
+            <td class="px-6 py-4">{{ comment.created_at }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </article>
 </section>
 {% endblock content %}

@@ -3,207 +3,213 @@
 {% block title %}Dashboard{% endblock title %}
 
 {% block content %}
-<section class="mb-8">
+<section class="mb-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
   <h1 class="text-3xl font-semibold text-slate-900">Dashboard</h1>
-  <p class="mt-2 text-sm text-slate-500">A simpler workspace for managing blog content and resource links.</p>
+  <p class="mt-2 text-sm text-slate-600">This page is organized for fast editing: pick a block, then click edit.</p>
+  <div class="mt-4 flex flex-wrap gap-2 text-sm">
+    <a href="#blog-area" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">Go to Blog</a>
+    <a href="#resource-area" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">Go to Resources</a>
+    <a href="{% url 'resource_admin_database' %}" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">Database View</a>
+  </div>
 </section>
 
-<section class="grid gap-8 xl:grid-cols-[260px_1fr]">
-  <aside class="space-y-6">
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 class="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">Overview</h2>
-      <div class="mt-4 space-y-3 text-sm">
-        <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3">
-          <span class="text-slate-600">Categories</span>
-          <span class="font-semibold text-slate-900">{{ category_count }}</span>
-        </div>
-        <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3">
-          <span class="text-slate-600">Posts</span>
-          <span class="font-semibold text-slate-900">{{ post_count }}</span>
-        </div>
-        <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3">
-          <span class="text-slate-600">Sections</span>
-          <span class="font-semibold text-slate-900">{{ section_count }}</span>
-        </div>
-        <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3">
-          <span class="text-slate-600">Groups</span>
-          <span class="font-semibold text-slate-900">{{ group_count }}</span>
-        </div>
-        <div class="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-3">
-          <span class="text-slate-600">Links</span>
-          <span class="font-semibold text-slate-900">{{ link_count }}</span>
-        </div>
+<section class="mb-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-6">
+  <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs uppercase tracking-[0.15em] text-slate-400">Categories</p>
+    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ category_count }}</p>
+    <a href="{% url 'category_create' %}" class="mt-4 inline-block text-sm font-medium text-sky-700 hover:text-sky-900">+ Add category</a>
+  </article>
+  <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs uppercase tracking-[0.15em] text-slate-400">Posts</p>
+    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ post_count }}</p>
+    <a href="{% url 'post_create' %}" class="mt-4 inline-block text-sm font-medium text-sky-700 hover:text-sky-900">+ Add post</a>
+  </article>
+  <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs uppercase tracking-[0.15em] text-slate-400">Sections</p>
+    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ section_count }}</p>
+    <a href="{% url 'resource_section_create' %}" class="mt-4 inline-block text-sm font-medium text-sky-700 hover:text-sky-900">+ Add section</a>
+  </article>
+  <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs uppercase tracking-[0.15em] text-slate-400">Groups</p>
+    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ group_count }}</p>
+    <a href="{% url 'resource_group_create' %}" class="mt-4 inline-block text-sm font-medium text-sky-700 hover:text-sky-900">+ Add group</a>
+  </article>
+  <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs uppercase tracking-[0.15em] text-slate-400">Links</p>
+    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ link_count }}</p>
+    <a href="{% url 'resource_link_create' %}" class="mt-4 inline-block text-sm font-medium text-sky-700 hover:text-sky-900">+ Add link</a>
+  </article>
+  <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <p class="text-xs uppercase tracking-[0.15em] text-slate-400">Comments</p>
+    <p class="mt-2 text-3xl font-semibold text-slate-900">{{ comment_count }}</p>
+    <a href="#comment-area" class="mt-4 inline-block text-sm font-medium text-sky-700 hover:text-sky-900">View comments</a>
+  </article>
+</section>
+
+<section id="blog-area" class="mb-8 rounded-2xl border border-slate-200 bg-white shadow-sm">
+  <div class="border-b border-slate-200 px-6 py-4">
+    <h2 class="text-xl font-semibold text-slate-900">Blog</h2>
+    <p class="mt-1 text-sm text-slate-500">Recent categories and posts. Click edit directly on each row.</p>
+  </div>
+
+  <div class="grid gap-6 p-6 lg:grid-cols-2">
+    <div>
+      <div class="mb-3 flex items-center justify-between">
+        <h3 class="font-medium text-slate-900">Categories</h3>
+        <span class="text-xs text-slate-400">{{ category_count }} total</span>
+      </div>
+      <div class="space-y-2">
+        {% for category in categories %}
+        <article class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-medium text-slate-900">{{ category.title }}</p>
+              <p class="mt-1 text-xs text-slate-500">{{ category.slug }}</p>
+              {% if category.subtitle %}
+              <p class="mt-1 text-sm text-slate-600">{{ category.subtitle }}</p>
+              {% endif %}
+            </div>
+            <div class="flex shrink-0 gap-3 text-sm">
+              <a href="{% url 'category_update' category.id %}" class="text-slate-700 hover:text-slate-900">Edit</a>
+              <a href="{% url 'category_delete' category.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
+            </div>
+          </div>
+        </article>
+        {% empty %}
+        <div class="rounded-xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">No categories yet.</div>
+        {% endfor %}
       </div>
     </div>
 
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 class="text-sm font-semibold uppercase tracking-[0.15em] text-slate-400">Quick Actions</h2>
-      <div class="mt-4 space-y-3">
-        <a href="{% url 'category_create' %}" class="block rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-700">Add category</a>
-        <a href="{% url 'post_create' %}" class="block rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-700">Add post</a>
-        <a href="{% url 'resource_section_create' %}" class="block rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-700">Add section</a>
-        <a href="{% url 'resource_group_create' %}" class="block rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-700">Add group</a>
-        <a href="{% url 'resource_link_create' %}" class="block rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white hover:bg-slate-700">Add link</a>
-        <a href="{% url 'resource_admin_database' %}" class="block rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50">Open database view</a>
+    <div>
+      <div class="mb-3 flex items-center justify-between">
+        <h3 class="font-medium text-slate-900">Recent posts</h3>
+        <span class="text-xs text-slate-400">{{ post_count }} total</span>
+      </div>
+      <div class="space-y-2">
+        {% for post in posts %}
+        <article class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+          <div class="flex items-start justify-between gap-3">
+            <div class="min-w-0">
+              <p class="font-medium text-slate-900">{{ post.title }}</p>
+              <p class="mt-1 text-xs text-slate-500">{{ post.author }}</p>
+              <p class="mt-1 text-sm text-slate-600">{{ post.overview|truncatechars:90 }}</p>
+            </div>
+            <div class="flex shrink-0 gap-3 text-sm">
+              <a href="{% url 'post_update' post.id %}" class="text-slate-700 hover:text-slate-900">Edit</a>
+              <a href="{% url 'post_delete' post.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
+            </div>
+          </div>
+        </article>
+        {% empty %}
+        <div class="rounded-xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">No posts yet.</div>
+        {% endfor %}
       </div>
     </div>
-  </aside>
+  </div>
 
-  <div class="space-y-8">
-    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div class="border-b border-slate-200 px-6 py-4">
-        <h2 class="text-xl font-semibold text-slate-900">Blog</h2>
-      </div>
-      <div class="grid gap-6 p-6 lg:grid-cols-2">
-        <div>
-          <div class="mb-3 flex items-center justify-between">
-            <h3 class="font-medium text-slate-900">Categories</h3>
-            <span class="text-xs text-slate-400">{{ category_count }} total</span>
+  <div id="comment-area" class="border-t border-slate-200 px-6 py-5">
+    <div class="mb-3 flex items-center justify-between">
+      <h3 class="font-medium text-slate-900">Latest comments</h3>
+      <span class="text-xs text-slate-400">{{ comment_count }} total</span>
+    </div>
+    <div class="space-y-2">
+      {% for comment in comments %}
+      <article class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+        <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+          <div class="min-w-0">
+            <p class="font-medium text-slate-900">{{ comment.author_name }}</p>
+            <p class="mt-1 text-xs text-slate-500">{{ comment.post.title }} - {{ comment.created_at|date:"M d, Y H:i" }}</p>
+            <p class="mt-2 text-sm text-slate-600">{{ comment.body|truncatechars:140 }}</p>
           </div>
-          <div class="overflow-hidden rounded-xl border border-slate-200">
-            <table class="min-w-full text-left text-sm">
-              <thead class="bg-slate-50 text-slate-500">
-                <tr>
-                  <th class="px-4 py-3">Title</th>
-                  <th class="px-4 py-3">Slug</th>
-                  <th class="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for category in categories %}
-                <tr class="border-t border-slate-200">
-                  <td class="px-4 py-3">
-                    <div class="font-medium text-slate-900">{{ category.title }}</div>
-                    <div class="text-xs text-slate-500">{{ category.subtitle }}</div>
-                  </td>
-                  <td class="px-4 py-3 text-slate-500">{{ category.slug }}</td>
-                  <td class="px-4 py-3 text-right">
-                    <a href="{% url 'category_update' category.id %}" class="mr-3 text-slate-600 hover:text-slate-900">Edit</a>
-                    <a href="{% url 'category_delete' category.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="3" class="px-4 py-6 text-slate-500">No categories yet.</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+          <div class="flex shrink-0 gap-3 text-sm">
+            <a href="{% url 'post' comment.post.slug %}" target="_blank" rel="noopener noreferrer" class="text-slate-700 hover:text-slate-900">Open post</a>
+            <a href="{% url 'comment_delete' comment.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
           </div>
         </div>
+      </article>
+      {% empty %}
+      <div class="rounded-xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">No comments yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
 
+<section id="resource-area" class="rounded-2xl border border-slate-200 bg-white shadow-sm">
+  <div class="border-b border-slate-200 px-6 py-4">
+    <h2 class="text-xl font-semibold text-slate-900">Resources</h2>
+    <p class="mt-1 text-sm text-slate-500">Use expand/collapse to focus one section at a time.</p>
+  </div>
+
+  <div class="space-y-4 p-6">
+    {% for section in sections %}
+    <details class="group rounded-xl border border-slate-200 bg-slate-50" open>
+      <summary class="flex cursor-pointer list-none flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <div class="mb-3 flex items-center justify-between">
-            <h3 class="font-medium text-slate-900">Recent posts</h3>
-            <span class="text-xs text-slate-400">{{ post_count }} total</span>
-          </div>
-          <div class="overflow-hidden rounded-xl border border-slate-200">
-            <table class="min-w-full text-left text-sm">
-              <thead class="bg-slate-50 text-slate-500">
-                <tr>
-                  <th class="px-4 py-3">Post</th>
-                  <th class="px-4 py-3">Author</th>
-                  <th class="px-4 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for post in posts %}
-                <tr class="border-t border-slate-200">
-                  <td class="px-4 py-3">
-                    <div class="font-medium text-slate-900">{{ post.title }}</div>
-                    <div class="text-xs text-slate-500">{{ post.overview|truncatechars:70 }}</div>
-                  </td>
-                  <td class="px-4 py-3 text-slate-500">{{ post.author }}</td>
-                  <td class="px-4 py-3 text-right">
-                    <a href="{% url 'post_update' post.id %}" class="mr-3 text-slate-600 hover:text-slate-900">Edit</a>
-                    <a href="{% url 'post_delete' post.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
-                  </td>
-                </tr>
-                {% empty %}
-                <tr>
-                  <td colspan="3" class="px-4 py-6 text-slate-500">No posts yet.</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
+          <p class="font-semibold text-slate-900">{{ section.title }}</p>
+          {% if section.description %}
+          <p class="mt-1 text-sm text-slate-600">{{ section.description }}</p>
+          {% endif %}
         </div>
-      </div>
-    </section>
+        <div class="flex gap-3 text-sm">
+          <a href="{% url 'resource_group_create' %}?section={{ section.id }}" class="text-slate-700 hover:text-slate-900">Add group</a>
+          <a href="{% url 'resource_section_update' section.id %}" class="text-slate-700 hover:text-slate-900">Edit</a>
+          <a href="{% url 'resource_section_delete' section.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
+        </div>
+      </summary>
 
-    <section class="rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div class="border-b border-slate-200 px-6 py-4">
-        <h2 class="text-xl font-semibold text-slate-900">Resources</h2>
-      </div>
-      <div class="space-y-6 p-6">
-        {% for section in sections %}
-        <div class="rounded-xl border border-slate-200">
-          <div class="flex flex-col gap-3 border-b border-slate-200 bg-slate-50 px-5 py-4 md:flex-row md:items-center md:justify-between">
+      <div class="space-y-3 border-t border-slate-200 px-5 py-4">
+        {% for group in section.groups.all %}
+        <article class="rounded-xl border border-slate-200 bg-white">
+          <div class="flex flex-col gap-3 border-b border-slate-200 px-4 py-3 md:flex-row md:items-center md:justify-between">
             <div>
-              <h3 class="font-semibold text-slate-900">{{ section.title }}</h3>
-              {% if section.description %}
-              <p class="mt-1 text-sm text-slate-500">{{ section.description }}</p>
+              <p class="font-medium text-slate-900">{{ group.title }}</p>
+              {% if group.description %}
+              <p class="text-sm text-slate-600">{{ group.description }}</p>
               {% endif %}
             </div>
             <div class="flex gap-3 text-sm">
-              <a href="{% url 'resource_group_create' %}?section={{ section.id }}" class="text-slate-600 hover:text-slate-900">Add group</a>
-              <a href="{% url 'resource_section_update' section.id %}" class="text-slate-600 hover:text-slate-900">Edit</a>
-              <a href="{% url 'resource_section_delete' section.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
+              <a href="{% url 'resource_link_create' %}?group={{ group.id }}" class="text-slate-700 hover:text-slate-900">Add link</a>
+              <a href="{% url 'resource_group_update' group.id %}" class="text-slate-700 hover:text-slate-900">Edit</a>
+              <a href="{% url 'resource_group_delete' group.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
             </div>
           </div>
 
-          <div class="space-y-4 p-5">
-            {% for group in section.groups.all %}
-            <div class="rounded-xl border border-slate-200 bg-white">
-              <div class="flex flex-col gap-3 border-b border-slate-200 px-4 py-3 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <div class="font-medium text-slate-900">{{ group.title }}</div>
-                  {% if group.description %}
-                  <div class="text-sm text-slate-500">{{ group.description }}</div>
+          <div class="space-y-2 p-4">
+            {% for link in group.links.all %}
+            <div class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-3">
+              <div class="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
+                <div class="min-w-0 flex-1">
+                  <p class="font-medium text-slate-900">{{ link.title }}</p>
+                  {% if link.url %}
+                  <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block break-all text-sm text-sky-700 hover:underline">{{ link.url }}</a>
+                  {% endif %}
+                  {% if link.document %}
+                  <a href="{{ link.document.url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block break-all text-sm text-emerald-700 hover:underline">{{ link.document.name|cut:"resources/files/" }}</a>
+                  {% endif %}
+                  {% if link.note %}
+                  <p class="mt-1 text-sm text-slate-600">{{ link.note }}</p>
                   {% endif %}
                 </div>
-                <div class="flex gap-3 text-sm">
-                  <a href="{% url 'resource_link_create' %}?group={{ group.id }}" class="text-slate-600 hover:text-slate-900">Add link</a>
-                  <a href="{% url 'resource_group_update' group.id %}" class="text-slate-600 hover:text-slate-900">Edit</a>
-                  <a href="{% url 'resource_group_delete' group.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
+                <div class="flex shrink-0 gap-3 text-sm">
+                  <a href="{% url 'resource_link_update' link.id %}" class="text-slate-700 hover:text-slate-900">Edit</a>
+                  <a href="{% url 'resource_link_delete' link.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
                 </div>
-              </div>
-
-              <div class="space-y-2 p-4">
-                {% for link in group.links.all %}
-                <div class="flex flex-col gap-2 rounded-lg bg-slate-50 px-4 py-3 md:flex-row md:items-start md:justify-between">
-                  <div class="min-w-0 flex-1">
-                    <div class="font-medium text-slate-900">{{ link.title }}</div>
-                    {% if link.url %}
-                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block break-all text-sm text-sky-600 hover:underline">{{ link.url }}</a>
-                    {% endif %}
-                    {% if link.document %}
-                    <a href="{{ link.document.url }}" target="_blank" rel="noopener noreferrer" class="mt-1 block break-all text-sm text-emerald-600 hover:underline">{{ link.document.name|cut:"resources/files/" }}</a>
-                    {% endif %}
-                    {% if link.note %}
-                    <div class="mt-1 text-sm text-slate-500">{{ link.note }}</div>
-                    {% endif %}
-                  </div>
-                  <div class="flex gap-3 text-sm whitespace-nowrap">
-                    <a href="{% url 'resource_link_update' link.id %}" class="text-slate-600 hover:text-slate-900">Edit</a>
-                    <a href="{% url 'resource_link_delete' link.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
-                  </div>
-                </div>
-                {% empty %}
-                <div class="rounded-lg border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-500">No links yet.</div>
-                {% endfor %}
               </div>
             </div>
             {% empty %}
-            <div class="rounded-lg border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-500">No groups yet.</div>
+            <div class="rounded-lg border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-500">No links yet.</div>
             {% endfor %}
           </div>
-        </div>
+        </article>
         {% empty %}
-        <div class="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500">No sections yet.</div>
+        <div class="rounded-lg border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-500">No groups yet.</div>
         {% endfor %}
       </div>
-    </section>
+    </details>
+    {% empty %}
+    <div class="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500">No sections yet.</div>
+    {% endfor %}
   </div>
 </section>
 {% endblock content %}

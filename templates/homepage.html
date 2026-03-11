@@ -1,107 +1,87 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="relative overflow-hidden bg-[linear-gradient(135deg,_#fff8fb_0%,_#fff_42%,_#f4fbff_100%)]">
-  <div class="absolute inset-0 opacity-70">
-    <div class="absolute -left-20 top-10 h-72 w-72 rounded-full bg-pink-200/50 blur-3xl"></div>
-    <div class="absolute right-0 top-0 h-80 w-80 rounded-full bg-sky-200/50 blur-3xl"></div>
-    <div class="absolute bottom-0 left-1/3 h-52 w-52 rounded-full bg-rose-100 blur-3xl"></div>
-  </div>
-
-  <div class="relative container mx-auto px-5 py-16 md:py-24">
-    <div class="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-      <div>
-        <p class="mb-4 inline-flex rounded-full border border-pink-200 bg-white/80 px-4 py-2 text-xs uppercase tracking-[0.3em] text-pink-500 shadow-sm">
-          Personal Blog + Resource Hub
-        </p>
-        <h1 class="max-w-3xl text-5xl font-semibold leading-tight text-slate-900 md:text-7xl">
-          Learn, collect, and organize everything in one place.
-        </h1>
-        <p class="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-          A clean space for blog posts, Japanese study materials, SRC game links, and travel references. Built to be simple to read and easy to manage.
-        </p>
-
-        <div class="mt-8 flex flex-wrap gap-4">
-          <a href="{% url 'resource_library' %}" class="rounded-full bg-slate-900 px-6 py-3 text-sm font-medium text-white transition hover:bg-slate-700">
-            Explore Resources
-          </a>
-          <a href="{% url 'allposts' %}" class="rounded-full border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-            Read Articles
-          </a>
-        </div>
-
-        <div class="mt-12 grid gap-4 sm:grid-cols-3">
-          <div class="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-lg shadow-pink-100/40 backdrop-blur">
-            <p class="text-sm text-slate-500">Categories</p>
-            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ categories|length }}</p>
-          </div>
-          <div class="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-lg shadow-pink-100/40 backdrop-blur">
-            <p class="text-sm text-slate-500">Featured</p>
-            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ object_list|length }}</p>
-          </div>
-          <div class="rounded-3xl border border-white/80 bg-white/80 p-5 shadow-lg shadow-pink-100/40 backdrop-blur">
-            <p class="text-sm text-slate-500">Resources</p>
-            <p class="mt-2 text-3xl font-semibold text-slate-900">{{ resource_sections|length }}</p>
-          </div>
-        </div>
+<style>
+  .reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+  }
+  .reveal-on-scroll.in-view {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-on-scroll {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
+<section class="bg-gradient-to-b from-rose-50 via-pink-50 to-white">
+  <div class="container mx-auto px-5 py-14 md:py-20">
+    <div class="reveal-on-scroll mx-auto max-w-4xl text-center">
+      <p class="text-xs uppercase tracking-[0.25em] text-rose-400">Personal Blog + Resource Hub</p>
+      <h1 class="mt-4 text-4xl font-semibold leading-tight text-rose-900 md:text-6xl">
+        No pain, no gain
+      </h1>
+      <p class="mx-auto mt-5 max-w-2xl text-base text-rose-700 md:text-lg">
+        Articles, documents, and useful links.
+      </p>
+      <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+        <a href="{% url 'allposts' %}" class="rounded-full bg-rose-500 px-6 py-3 text-sm font-medium text-white transition hover:bg-rose-600">
+          View article
+        </a>
+        <a href="{% url 'resource_library' %}" class="rounded-full border border-rose-200 bg-white/80 px-6 py-3 text-sm font-medium text-rose-700 transition hover:bg-rose-50">
+          View document
+        </a>
       </div>
+    </div>
 
-      <div class="relative">
-        <div class="rounded-[2rem] border border-white/70 bg-white/90 p-6 shadow-2xl shadow-pink-100/50 backdrop-blur">
-          <div class="mb-6 flex items-center justify-between">
-            <div>
-              <p class="text-xs uppercase tracking-[0.25em] text-pink-400">Featured topics</p>
-              <h2 class="mt-2 text-2xl font-semibold text-slate-900">Start from what matters most</h2>
-            </div>
-            <div class="rounded-full bg-pink-100 px-4 py-2 text-xs font-medium text-pink-500">Updated</div>
-          </div>
-
-          <div class="space-y-4">
-            {% for category in categories %}
-            <a href="{% url 'postlist' category.slug %}" class="group flex items-center gap-4 rounded-3xl border border-slate-200 bg-slate-50 px-4 py-4 transition hover:-translate-y-0.5 hover:border-pink-200 hover:bg-white hover:shadow-md">
-              <img src="{{ category.thumbnail.url }}" alt="{{ category.title }}" class="h-20 w-20 rounded-2xl object-cover">
-              <div class="flex-1">
-                <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Category</p>
-                <h3 class="mt-1 text-lg font-semibold text-slate-900">{{ category.title }}</h3>
-                <p class="mt-1 text-sm text-slate-500">{{ category.subtitle }}</p>
-              </div>
-              <span class="text-sm font-medium text-pink-500 transition group-hover:translate-x-1">Open</span>
-            </a>
-            {% endfor %}
-          </div>
-        </div>
+    <div class="mx-auto mt-10 grid max-w-3xl gap-3 sm:grid-cols-3">
+      <div class="reveal-on-scroll rounded-2xl border border-rose-200 bg-white/80 p-4 text-center" data-delay="0.05">
+        <p class="text-xs uppercase tracking-[0.15em] text-rose-400">Categories</p>
+        <p class="mt-2 text-2xl font-semibold text-rose-900">{{ categories|length }}</p>
+      </div>
+      <div class="reveal-on-scroll rounded-2xl border border-rose-200 bg-white/80 p-4 text-center" data-delay="0.12">
+        <p class="text-xs uppercase tracking-[0.15em] text-rose-400">Posts</p>
+        <p class="mt-2 text-2xl font-semibold text-rose-900">{{ object_list|length }}</p>
+      </div>
+      <div class="reveal-on-scroll rounded-2xl border border-rose-200 bg-white/80 p-4 text-center" data-delay="0.19">
+        <p class="text-xs uppercase tracking-[0.15em] text-rose-400">Resources</p>
+        <p class="mt-2 text-2xl font-semibold text-rose-900">{{ resource_sections|length }}</p>
       </div>
     </div>
   </div>
 </section>
 
 <section class="bg-white">
-  <div class="container mx-auto px-5 py-20">
-    <div class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+  <div class="container mx-auto px-5 py-14 md:py-16">
+    <div class="reveal-on-scroll mb-8 flex items-end justify-between">
       <div>
-        <p class="text-sm uppercase tracking-[0.25em] text-pink-400">Latest Writing</p>
-        <h2 class="mt-2 text-4xl font-semibold text-slate-900">Recent posts</h2>
+        <p class="text-xs uppercase tracking-[0.2em] text-rose-400">Latest Writing</p>
+        <h2 class="mt-2 text-3xl font-semibold text-rose-900">Latest Articles</h2>
       </div>
-      <a href="{% url 'allposts' %}" class="text-sm font-medium text-slate-600 hover:text-pink-500">View all posts</a>
+      <a href="{% url 'allposts' %}" class="text-sm font-medium text-rose-600 hover:text-rose-800">Tat ca</a>
     </div>
 
     <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
       {% for post in latest %}
-      <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-slate-200/60">
+      <article class="reveal-on-scroll overflow-hidden rounded-2xl border border-rose-200 bg-white transition hover:shadow-md hover:shadow-rose-100" data-delay="0.{{ forloop.counter }}">
         <a href="{% url 'post' post.slug %}" class="block">
-          <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}" class="h-60 w-full object-cover">
+          <img src="{{ post.thumbnail.url }}" alt="{{ post.title }}" class="h-56 w-full object-cover">
         </a>
-        <div class="p-6">
-          <div class="mb-4 flex flex-wrap gap-2">
+        <div class="p-5">
+          <div class="mb-3 flex flex-wrap gap-2">
             {% for category in post.categories.all %}
-            <span class="rounded-full bg-pink-50 px-3 py-1 text-xs font-medium text-pink-500">{{ category.title }}</span>
+            <span class="rounded-full bg-rose-100 px-3 py-1 text-xs font-medium text-rose-700">{{ category.title }}</span>
             {% endfor %}
           </div>
-          <h3 class="text-2xl font-semibold text-slate-900">{{ post.title }}</h3>
-          <p class="mt-3 line-clamp-3 text-sm leading-7 text-slate-500">{{ post.overview }}</p>
-          <div class="mt-6 flex items-center justify-between">
-            <p class="text-xs uppercase tracking-[0.2em] text-slate-400">{{ post.timestamp|date:"M d, Y" }}</p>
-            <a href="{% url 'post' post.slug %}" class="text-sm font-medium text-pink-500 hover:text-pink-600">Read more</a>
+          <h3 class="line-clamp-2 text-xl font-semibold text-rose-900">{{ post.title }}</h3>
+          <div class="mt-4 flex items-center justify-between">
+            <p class="text-xs uppercase tracking-[0.2em] text-rose-400">{{ post.timestamp|date:"M d, Y" }}</p>
+            <a href="{% url 'post' post.slug %}" class="text-sm font-medium text-rose-600 hover:text-rose-800">View</a>
           </div>
         </div>
       </article>
@@ -110,35 +90,28 @@
   </div>
 </section>
 
-<section class="bg-slate-50">
-  <div class="container mx-auto px-5 py-20">
-    <div class="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+<section class="bg-rose-50/70">
+  <div class="container mx-auto px-5 py-14 md:py-16">
+    <div class="reveal-on-scroll mb-8 flex items-end justify-between">
       <div>
-        <p class="text-sm uppercase tracking-[0.25em] text-sky-500">Library Preview</p>
-        <h2 class="mt-2 text-4xl font-semibold text-slate-900">Organized resources</h2>
+        <p class="text-xs uppercase tracking-[0.2em] text-rose-400">Library Preview</p>
+        <h2 class="mt-2 text-3xl font-semibold text-rose-900">Document category</h2>
       </div>
-      <a href="{% url 'resource_library' %}" class="text-sm font-medium text-slate-600 hover:text-sky-500">Open full library</a>
+      <a href="{% url 'resource_library' %}" class="text-sm font-medium text-rose-600 hover:text-rose-800">Mo thu vien</a>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-3">
       {% for section in resource_sections %}
-      <article class="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-        <div class="mb-5">
-          <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Resource section</p>
-          <h3 class="mt-2 text-2xl font-semibold text-slate-900">{{ section.title }}</h3>
-          {% if section.description %}
-          <p class="mt-3 text-sm leading-7 text-slate-500">{{ section.description }}</p>
-          {% endif %}
-        </div>
-
+      <article class="reveal-on-scroll rounded-2xl border border-rose-200 bg-white p-5" data-delay="0.{{ forloop.counter }}">
+        <h3 class="mb-4 text-xl font-semibold text-rose-900">{{ section.title }}</h3>
         <div class="space-y-3">
           {% for group in section.groups.all|slice:":4" %}
-          <div class="flex items-center justify-between rounded-2xl bg-slate-50 px-4 py-3">
-            <span class="font-medium text-slate-700">{{ group.title }}</span>
-            <span class="text-xs uppercase tracking-[0.15em] text-slate-400">{{ group.links.count }} items</span>
+          <div class="flex items-center justify-between rounded-xl bg-rose-50 px-4 py-3">
+            <span class="font-medium text-rose-800">{{ group.title }}</span>
+            <span class="text-xs uppercase tracking-[0.15em] text-rose-400">{{ group.links.count }} items</span>
           </div>
           {% empty %}
-          <div class="rounded-2xl border border-dashed border-slate-300 px-4 py-5 text-sm text-slate-500">
+          <div class="rounded-xl border border-dashed border-rose-200 px-4 py-5 text-sm text-rose-500">
             No groups available yet.
           </div>
           {% endfor %}
@@ -148,4 +121,27 @@
     </div>
   </div>
 </section>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const items = document.querySelectorAll(".reveal-on-scroll");
+    if (!("IntersectionObserver" in window)) {
+      items.forEach((el) => el.classList.add("in-view"));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const delay = entry.target.dataset.delay || "0";
+            entry.target.style.transitionDelay = `${delay}s`;
+            entry.target.classList.add("in-view");
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+    );
+    items.forEach((el) => observer.observe(el));
+  });
+</script>
 {% endblock content %}

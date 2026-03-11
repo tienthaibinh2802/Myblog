@@ -9,12 +9,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import (
     AdminLoginForm,
     CategoryForm,
+    CommentForm,
     PostForm,
     ResourceGroupForm,
     ResourceLinkForm,
     ResourceSectionForm,
 )
-from .models import Category, Post, Author, ResourceGroup, ResourceLink, ResourceSection
+from .models import Author, Category, Comment, Post, ResourceGroup, ResourceLink, ResourceSection
 
 
 def staff_required(view_func):
@@ -50,10 +51,24 @@ def homepage (request):
 
 def post (request,slug):
     post = get_object_or_404(Post, slug=slug)
+    if request.method == "POST":
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.save()
+            messages.success(request, "Comment da duoc gui.")
+            return redirect("post", slug=slug)
+    else:
+        comment_form = CommentForm()
+
     latest = Post.objects.order_by('-timestamp')[:3]
+    comments = post.comments.all()
     context = {
         'post': post,
         'latest': latest,
+        'comments': comments,
+        'comment_form': comment_form,
     }
     return render(request, 'post.html', context)
 
@@ -119,15 +134,18 @@ def resource_admin_dashboard(request):
     sections = ResourceSection.objects.prefetch_related("groups__links")
     categories = Category.objects.order_by("title")
     posts = Post.objects.select_related("author").prefetch_related("categories").order_by("-timestamp")[:8]
+    comments = Comment.objects.select_related("post").order_by("-created_at")[:10]
     context = {
         "sections": sections,
         "categories": categories,
         "posts": posts,
+        "comments": comments,
         "section_count": ResourceSection.objects.count(),
         "group_count": ResourceGroup.objects.count(),
         "link_count": ResourceLink.objects.count(),
         "category_count": Category.objects.count(),
         "post_count": Post.objects.count(),
+        "comment_count": Comment.objects.count(),
     }
     return render(request, "resource_admin/dashboard.html", context)
 
@@ -142,6 +160,7 @@ def resource_admin_database(request):
     links = ResourceLink.objects.select_related("group", "group__section")
     categories = Category.objects.all()
     posts = Post.objects.select_related("author").prefetch_related("categories").order_by("-timestamp")
+    comments = Comment.objects.select_related("post").order_by("-created_at")
 
     if selected_section:
         sections = sections.filter(id=selected_section)
@@ -171,12 +190,18 @@ def resource_admin_database(request):
             | Q(overview__icontains=query)
             | Q(author__user__username__icontains=query)
         ).distinct()
+        comments = comments.filter(
+            Q(author_name__icontains=query)
+            | Q(body__icontains=query)
+            | Q(post__title__icontains=query)
+        )
     context = {
         "sections": sections,
         "groups": groups,
         "links": links,
         "categories": categories,
         "posts": posts,
+        "comments": comments,
         "query": query,
         "selected_section": selected_section,
         "all_sections": ResourceSection.objects.all(),
@@ -423,5 +448,23 @@ def post_delete(request, pk):
             "object_name": post.title,
             "cancel_url": "/sql/",
             "page_title": "Delete post",
+        },
+    )
+
+
+@staff_required
+def comment_delete(request, pk):
+    comment = get_object_or_404(Comment, pk=pk)
+    if request.method == "POST":
+        comment.delete()
+        messages.success(request, "Comment deleted successfully.")
+        return redirect("resource_admin_dashboard")
+    return render(
+        request,
+        "resource_admin/confirm_delete.html",
+        {
+            "object_name": f"Comment by {comment.author_name}",
+            "cancel_url": "/sql/",
+            "page_title": "Delete comment",
         },
     )
