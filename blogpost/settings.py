@@ -22,11 +22,17 @@ def get_list_env(name, default):
 
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = get_list_env(
-    "ALLOWED_HOSTS",
-    ["myblog-x7wk.onrender.com", "localhost", "127.0.0.1"],
-)
+render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
+
+ALLOWED_HOSTS = get_list_env("ALLOWED_HOSTS", ["localhost", "127.0.0.1"])
+if render_hostname and render_hostname not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append(render_hostname)
+
 CSRF_TRUSTED_ORIGINS = get_list_env("CSRF_TRUSTED_ORIGINS", [])
+if render_hostname:
+    render_origin = f"https://{render_hostname}"
+    if render_origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(render_origin)
 
 
 # Application definition
