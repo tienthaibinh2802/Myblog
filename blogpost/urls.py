@@ -66,8 +66,9 @@ urlpatterns = [
     
 ]
 
-if settings.DEBUG or os.getenv("RENDER", "").lower() == "true":
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Always expose MEDIA files from MEDIA_ROOT.
+# This keeps uploaded images visible on simple hosting setups.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
