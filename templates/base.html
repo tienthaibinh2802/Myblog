@@ -66,11 +66,63 @@
         display: none;
       }
     }
+    .header-slider-shell {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(226, 232, 240, 0.9), transparent 34%),
+        linear-gradient(90deg, #f8fafc 0%, #fffbf7 50%, #f8fafc 100%);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+    }
+    .header-slider-shell::before,
+    .header-slider-shell::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 72px;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .header-slider-shell::before {
+      left: 0;
+      background: linear-gradient(90deg, rgba(248, 250, 252, 1), rgba(248, 250, 252, 0));
+    }
+    .header-slider-shell::after {
+      right: 0;
+      background: linear-gradient(270deg, rgba(248, 250, 252, 1), rgba(248, 250, 252, 0));
+    }
+    .header-slider-track {
+      display: flex;
+      width: max-content;
+      animation: header-slider-move 28s linear infinite;
+    }
+    .header-slider-shell:hover .header-slider-track {
+      animation-play-state: paused;
+    }
+    .header-slider-card {
+      width: min(86vw, 320px);
+      flex: 0 0 auto;
+    }
+    @keyframes header-slider-move {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(-50%);
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .header-slider-track {
+        animation: none;
+      }
+    }
   </style>
   </head>
-  <body>
+  <body class="bg-stone-50 text-slate-700">
     <div class="flower-overlay" id="flowerOverlay" aria-hidden="true"></div>
     {% include "navbar.html" %}
+    {% include "header_slider.html" %}
     {% block content %}
     {% endblock content %}
     {% include "footer.html" %}

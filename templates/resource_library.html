@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<section class="bg-gradient-to-b from-rose-50 via-white to-sky-50 text-gray-700 body-font">
+<section class="bg-gradient-to-b from-rose-50 via-stone-50 to-white text-slate-700 body-font">
   <div class="container px-5 py-20 mx-auto">
     <div class="max-w-3xl mb-14">
-      <p class="tracking-[0.3em] text-xs uppercase text-pink-500 mb-3">Resource Archive</p>
-      <h1 class="text-4xl md:text-5xl font-serif text-gray-900 mb-4">Resource Library</h1>
+      <p class="tracking-[0.3em] text-xs uppercase text-rose-400 mb-3">Resource Archive</p>
+      <h1 class="text-4xl md:text-5xl font-serif text-slate-900 mb-4">Resource Library</h1>
       <p class="text-base md:text-lg leading-8">
         A central place for Japanese study materials, SRC game references, and travel resources.
       </p>
@@ -13,12 +13,12 @@
 
     <div class="space-y-10">
       {% for section in sections %}
-      <article class="rounded-3xl border border-rose-100 bg-white/90 shadow-lg shadow-rose-100/50 overflow-hidden">
-        <div class="px-8 py-8 border-b border-rose-100 bg-gradient-to-r from-white via-rose-50 to-sky-50">
+      <article class="rounded-3xl border border-rose-100 bg-white/90 shadow-lg shadow-rose-100/30 overflow-hidden">
+        <div class="px-8 py-8 border-b border-rose-100 bg-gradient-to-r from-white via-rose-50 to-stone-50">
           <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <p class="text-sm uppercase tracking-[0.25em] text-pink-400">Section</p>
-              <h2 class="text-3xl font-serif text-gray-900">{{ section.title }}</h2>
+              <p class="text-sm uppercase tracking-[0.25em] text-rose-400">Section</p>
+              <h2 class="text-3xl font-serif text-slate-900">{{ section.title }}</h2>
             </div>
             {% if section.description %}
             <p class="max-w-2xl text-sm md:text-base leading-7 text-gray-600">{{ section.description }}</p>
@@ -29,9 +29,9 @@
         <div class="px-8 py-8">
           <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {% for group in section.groups.all %}
-            <div class="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <div class="rounded-2xl border border-rose-100 bg-stone-50 p-6">
               <div class="mb-5">
-                <h3 class="text-xl font-semibold text-gray-900">{{ group.title }}</h3>
+                <h3 class="text-xl font-semibold text-slate-900">{{ group.title }}</h3>
                 {% if group.description %}
                 <p class="text-sm text-gray-500 mt-2 leading-6">{{ group.description }}</p>
                 {% endif %}
@@ -41,28 +41,28 @@
               <div class="space-y-3">
                 {% for link in group.links.all %}
                 {% if link.url %}
-                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="flex items-start justify-between gap-4 rounded-xl bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:border-pink-300 hover:shadow-md border border-transparent">
+                <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="flex items-start justify-between gap-4 rounded-xl border border-transparent bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md">
                   <div>
-                    <p class="font-medium text-gray-900">{{ link.title }}</p>
+                    <p class="font-medium text-slate-900">{{ link.title }}</p>
                     {% if link.note %}
                     <p class="text-sm text-gray-500 mt-1">{{ link.note }}</p>
                     {% endif %}
                     {% if link.document %}
-                    <p class="text-sm text-sky-600 mt-1">Attached file: {{ link.document.name|cut:"resources/files/" }}</p>
+                    <p class="text-sm text-rose-500 mt-1">Attached file: {{ link.document.name|cut:"resources/files/" }}</p>
                     {% endif %}
                   </div>
-                  <span class="text-pink-500 text-sm whitespace-nowrap">Open</span>
+                  <span class="text-rose-500 text-sm whitespace-nowrap">Open</span>
                 </a>
                 {% elif link.document %}
-                <a href="{{ link.document.url }}" target="_blank" rel="noopener noreferrer" class="flex items-start justify-between gap-4 rounded-xl bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:border-pink-300 hover:shadow-md border border-transparent">
+                <a href="{{ link.document.url }}" target="_blank" rel="noopener noreferrer" class="flex items-start justify-between gap-4 rounded-xl border border-transparent bg-white px-4 py-3 transition hover:-translate-y-0.5 hover:border-rose-200 hover:shadow-md">
                   <div>
-                    <p class="font-medium text-gray-900">{{ link.title }}</p>
-                    <p class="text-sm text-sky-600 mt-1">File: {{ link.document.name|cut:"resources/files/" }}</p>
+                    <p class="font-medium text-slate-900">{{ link.title }}</p>
+                    <p class="text-sm text-rose-500 mt-1">File: {{ link.document.name|cut:"resources/files/" }}</p>
                     {% if link.note %}
                     <p class="text-sm text-gray-500 mt-1">{{ link.note }}</p>
                     {% endif %}
                   </div>
-                  <span class="text-pink-500 text-sm whitespace-nowrap">Download</span>
+                  <span class="text-rose-500 text-sm whitespace-nowrap">Download</span>
                 </a>
                 {% endif %}
                 {% endfor %}
