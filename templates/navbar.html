@@ -2,7 +2,7 @@
 
 {% get_categories as category_list %}
     
-    <header class="body-font border-b border-rose-100 bg-white/90 text-slate-600 backdrop-blur-sm">
+    <header class="body-font relative z-50 border-b border-rose-100 bg-white/90 text-slate-600 backdrop-blur-sm">
     <div class="container mx-auto flex flex-wrap items-center p-5 md:flex-row">
       <a class="mb-4 flex title-font items-center font-medium text-slate-900 md:mb-0">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#e11d48" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="40" height="40" class="rounded-full bg-rose-50 p-2" viewBox="0 0 24 24">
@@ -22,7 +22,7 @@
           Resources
         </a>
           <!-- This example requires Tailwind CSS v2.0+ -->
-<div x-data="{ open: false }" class="relative inline-block text-left">
+<div x-data="{ open: false }" class="relative z-50 inline-block text-left">
   <div>
     <button @click="open = ! open" type="button" class="inline-flex w-full justify-center rounded-full border border-rose-100 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-rose-50 focus:outline-none focus:ring-2 focus:ring-rose-200 focus:ring-offset-2 focus:ring-offset-white" id="menu-button" aria-expanded="true" aria-haspopup="true">
       Categories
@@ -41,7 +41,7 @@
     x-transition:leave="transition ease-in duration-75"
     x-transition:leave-start="transform opacity-100 scale-100"
     x-transition:leave-end="transform opacity-0 scale-95"
-    class="origin-top-right absolute right-0 mt-2 w-56 rounded-2xl border border-rose-100 bg-white shadow-lg shadow-rose-100/40 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+    class="origin-top-right absolute right-0 z-50 mt-2 w-56 rounded-2xl border border-rose-100 bg-white shadow-lg shadow-rose-100/40 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
     <div class="py-1" role="none">
       <!-- Active: "bg-gray-100 text-gray-900", Not Active: "text-gray-700" -->
       {% for category in category_list %}
