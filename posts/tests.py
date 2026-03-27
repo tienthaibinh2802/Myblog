@@ -198,3 +198,63 @@ class ResourceAdminTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, reverse("post_update", args=[post.id]))
         self.assertContains(response, reverse("post_delete", args=[post.id]))
+
+    def test_post_form_rejects_duplicate_slug(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        category = Category.objects.create(
+            title="Learn",
+            subtitle="Study notes",
+            slug="learn",
+            thumbnail=SimpleUploadedFile("learn.jpg", b"image-bytes", content_type="image/jpeg"),
+        )
+        Post.objects.create(
+            title="Bai cu",
+            slug="slug-trung",
+            overview="Mo ta",
+            content="Noi dung",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("thumb-old.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+        ).categories.add(category)
+
+        response = self.client.post(
+            reverse("post_create"),
+            {
+                "title": "Bai moi",
+                "slug": "slug-trung",
+                "overview": "Mo ta moi",
+                "content": "Noi dung moi",
+                "author_name": "Sensei Hana",
+                "categories": [category.id],
+                "thumbnail": SimpleUploadedFile("thumb-new.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Slug nay da ton tai")
+
+    def test_post_view_uses_latest_post_when_slug_is_duplicated(self):
+        older_post = Post.objects.create(
+            title="Bai cu",
+            slug="slug-bi-trung",
+            overview="Mo ta cu",
+            content="Noi dung cu",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("old.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+        )
+        newer_post = Post.objects.create(
+            title="Bai moi",
+            slug="slug-bi-trung",
+            overview="Mo ta moi",
+            content="Noi dung moi",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("new.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+        )
+
+        response = self.client.get(reverse("post", args=["slug-bi-trung"]))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, newer_post.title)
+        self.assertNotContains(response, older_post.title)

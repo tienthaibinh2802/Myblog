@@ -23,8 +23,8 @@
         {% if post.author.profile_picture %}
         <img class="mr-4 h-10 w-10 rounded-full object-cover" src="{{ post.author.profile_picture.url }}" alt="author">
         {% else %}
-        <div class="mr-4 flex h-10 w-10 items-center justify-center rounded-full bg-rose-100 text-sm font-semibold text-rose-700">
-          {{ post.author|slice:":1"|upper }}
+        <div class="mr-4 flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-rose-100 text-sm font-semibold uppercase leading-none text-rose-700">
+          {{ post.author|stringformat:"s"|first }}
         </div>
         {% endif %}
         <div class="flex-1 px-2">

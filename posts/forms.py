@@ -102,6 +102,15 @@ class PostForm(forms.ModelForm):
         if self.instance.pk and self.instance.author_id:
             self.fields["author_name"].initial = self.instance.author.display_name or self.instance.author.user.username
 
+    def clean_slug(self):
+        slug = self.cleaned_data["slug"].strip()
+        queryset = Post.objects.filter(slug=slug)
+        if self.instance.pk:
+            queryset = queryset.exclude(pk=self.instance.pk)
+        if queryset.exists():
+            raise forms.ValidationError("Slug nay da ton tai. Vui long nhap slug khac.")
+        return slug
+
     def save(self, commit=True):
         post = super().save(commit=False)
         post.author = self._get_or_create_author(self.cleaned_data["author_name"])

@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Q 
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import (
@@ -50,7 +51,9 @@ def homepage (request):
     return render(request, 'homepage.html',context)
 
 def post (request,slug):
-    post = get_object_or_404(Post, slug=slug)
+    post = Post.objects.filter(slug=slug).order_by("-timestamp", "-id").first()
+    if not post:
+        raise Http404()
     if request.method == "POST":
         comment_form = CommentForm(request.POST)
         if comment_form.is_valid():
