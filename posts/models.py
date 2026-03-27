@@ -6,10 +6,11 @@ User = get_user_model()
 
 class Author(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    profile_picture = models.ImageField()
+    display_name = models.CharField(max_length=150, blank=True)
+    profile_picture = models.ImageField(blank=True)
 
     def __str__(self):
-        return self.user.username
+        return self.display_name or self.user.username
 
 class Category(models.Model):
     title = models.CharField(max_length=20)

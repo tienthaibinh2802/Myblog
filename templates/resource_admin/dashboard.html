@@ -84,7 +84,10 @@
     <div>
       <div class="mb-3 flex items-center justify-between">
         <h3 class="font-medium text-slate-900">Recent posts</h3>
-        <span class="text-xs text-slate-400">{{ post_count }} total</span>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-slate-400">{{ post_count }} total</span>
+          <a href="{% url 'resource_admin_database' %}#post-table" class="text-xs font-medium text-sky-700 hover:text-sky-900">View all</a>
+        </div>
       </div>
       <div class="space-y-2">
         {% for post in posts %}

@@ -1,7 +1,12 @@
 from django import forms
+from django.db.models import Q
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 from .models import Author, Category, Comment, Post, ResourceGroup, ResourceLink, ResourceSection
+
+User = get_user_model()
 
 
 class AdminLoginForm(AuthenticationForm):
@@ -66,9 +71,14 @@ class CategoryForm(forms.ModelForm):
 
 
 class PostForm(forms.ModelForm):
-    author = forms.ModelChoiceField(
-        queryset=Author.objects.select_related("user"),
-        widget=forms.Select(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
+    author_name = forms.CharField(
+        label="Author",
+        widget=forms.TextInput(
+            attrs={
+                "class": "w-full rounded-xl border border-slate-300 px-4 py-3",
+                "placeholder": "Nhap ten tac gia",
+            }
+        ),
     )
     categories = forms.ModelMultipleChoiceField(
         queryset=Category.objects.all(),
@@ -77,7 +87,7 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ["title", "slug", "overview", "content", "author", "thumbnail", "categories", "featured"]
+        fields = ["title", "slug", "overview", "content", "thumbnail", "categories", "featured"]
         widgets = {
             "title": forms.TextInput(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
             "slug": forms.TextInput(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
@@ -86,6 +96,39 @@ class PostForm(forms.ModelForm):
             "thumbnail": forms.ClearableFileInput(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
             "featured": forms.CheckboxInput(attrs={"class": "h-5 w-5 rounded border-slate-300 text-pink-500 focus:ring-pink-500"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk and self.instance.author_id:
+            self.fields["author_name"].initial = self.instance.author.display_name or self.instance.author.user.username
+
+    def save(self, commit=True):
+        post = super().save(commit=False)
+        post.author = self._get_or_create_author(self.cleaned_data["author_name"])
+        if commit:
+            post.save()
+            self.save_m2m()
+        return post
+
+    def _get_or_create_author(self, author_name):
+        normalized_name = author_name.strip()
+        existing_author = Author.objects.select_related("user").filter(
+            Q(display_name__iexact=normalized_name) | Q(user__username__iexact=normalized_name)
+        ).first()
+        if existing_author:
+            return existing_author
+
+        base_username = slugify(normalized_name) or "author"
+        username = base_username
+        counter = 2
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}-{counter}"
+            counter += 1
+
+        user = User.objects.create(username=username)
+        user.set_unusable_password()
+        user.save(update_fields=["password"])
+        return Author.objects.create(user=user, display_name=normalized_name)
 
 
 class CommentForm(forms.ModelForm):

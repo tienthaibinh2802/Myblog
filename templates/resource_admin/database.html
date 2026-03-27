@@ -168,7 +168,7 @@
     </div>
   </article>
 
-  <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+  <article id="post-table" class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
     <div class="border-b border-slate-200 px-8 py-5">
       <h2 class="text-2xl font-semibold text-slate-900">Post</h2>
     </div>
@@ -182,6 +182,7 @@
             <th class="px-6 py-4">Author</th>
             <th class="px-6 py-4">Featured</th>
             <th class="px-6 py-4">Time</th>
+            <th class="px-6 py-4">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -193,9 +194,15 @@
             <td class="px-6 py-4">{{ post.author }}</td>
             <td class="px-6 py-4">{% if post.featured %}Yes{% else %}No{% endif %}</td>
             <td class="px-6 py-4">{{ post.timestamp }}</td>
+            <td class="px-6 py-4">
+              <div class="flex gap-3">
+                <a href="{% url 'post_update' post.id %}" class="text-slate-700 hover:text-slate-900">Edit</a>
+                <a href="{% url 'post_delete' post.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
+              </div>
+            </td>
           </tr>
           {% empty %}
-          <tr><td colspan="6" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          <tr><td colspan="7" class="px-6 py-6 text-slate-500">No data found.</td></tr>
           {% endfor %}
         </tbody>
       </table>

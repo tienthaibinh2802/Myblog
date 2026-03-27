@@ -3,9 +3,14 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 
-from .models import Author, Category, ResourceGroup, ResourceLink, ResourceSection
+from .models import Author, Category, Post, ResourceGroup, ResourceLink, ResourceSection
 
 User = get_user_model()
+TEST_GIF_BYTES = (
+    b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00"
+    b"\xff\xff\xff!\xf9\x04\x00\x00\x00\x00\x00,\x00"
+    b"\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;"
+)
 
 
 class ResourceLibraryViewTests(TestCase):
@@ -67,7 +72,7 @@ class ResourceAdminTests(TestCase):
         )
         self.author = Author.objects.create(
             user=self.user,
-            profile_picture=SimpleUploadedFile("avatar.jpg", b"avatar-bytes", content_type="image/jpeg"),
+            profile_picture=SimpleUploadedFile("avatar.gif", TEST_GIF_BYTES, content_type="image/gif"),
         )
 
     def test_dashboard_requires_login(self):
@@ -126,3 +131,70 @@ class ResourceAdminTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Create post")
+
+    def test_post_create_page_uses_author_name_input(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        Category.objects.create(
+            title="Learn",
+            subtitle="Study notes",
+            slug="learn",
+            thumbnail=SimpleUploadedFile("learn.jpg", b"image-bytes", content_type="image/jpeg"),
+        )
+
+        response = self.client.get(reverse("post_create"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="author_name"')
+
+    def test_staff_can_create_post_with_typed_author_name(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        category = Category.objects.create(
+            title="Learn",
+            subtitle="Study notes",
+            slug="learn",
+            thumbnail=SimpleUploadedFile("learn.jpg", b"image-bytes", content_type="image/jpeg"),
+        )
+
+        response = self.client.post(
+            reverse("post_create"),
+            {
+                "title": "Hoc ngu phap",
+                "slug": "hoc-ngu-phap",
+                "overview": "Tong hop ngu phap can ban",
+                "content": "Noi dung bai viet",
+                "author_name": "Sensei Hana",
+                "categories": [category.id],
+                "featured": "on",
+                "thumbnail": SimpleUploadedFile("post.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        post = Post.objects.get(slug="hoc-ngu-phap")
+        self.assertEqual(str(post.author), "Sensei Hana")
+        self.assertEqual(post.author.display_name, "Sensei Hana")
+
+    def test_database_page_post_table_has_edit_delete_actions(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        category = Category.objects.create(
+            title="Computer",
+            subtitle="Tech",
+            slug="computer",
+            thumbnail=SimpleUploadedFile("computer.jpg", b"image-bytes", content_type="image/jpeg"),
+        )
+        post = Post.objects.create(
+            title="May tinh co ban",
+            slug="may-tinh-co-ban",
+            overview="Gioi thieu tong quan",
+            content="Noi dung",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("thumb.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+        )
+        post.categories.add(category)
+
+        response = self.client.get(reverse("resource_admin_database"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("post_update", args=[post.id]))
+        self.assertContains(response, reverse("post_delete", args=[post.id]))
