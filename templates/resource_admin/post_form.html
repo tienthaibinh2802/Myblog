@@ -30,4 +30,37 @@
     </div>
   </form>
 </section>
+<script>
+  (function () {
+    const titleInput = document.getElementById("id_title");
+    const slugInput = document.getElementById("id_slug");
+    if (!titleInput || !slugInput) return;
+
+    const normalizeVietnamese = (value) =>
+      value
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/\u0111/g, "d")
+        .replace(/\u0110/g, "D");
+
+    const slugify = (value) =>
+      normalizeVietnamese(value)
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-");
+
+    let slugTouched = slugInput.value.trim().length > 0;
+
+    slugInput.addEventListener("input", function () {
+      slugTouched = this.value.trim().length > 0;
+    });
+
+    titleInput.addEventListener("input", function () {
+      if (slugTouched) return;
+      slugInput.value = slugify(this.value);
+    });
+  })();
+</script>
 {% endblock content %}

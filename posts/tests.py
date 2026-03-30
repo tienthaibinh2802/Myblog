@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.messages import get_messages
 
 from .models import Author, Category, Post, ResourceGroup, ResourceLink, ResourceSection
 
@@ -164,6 +165,7 @@ class ResourceAdminTests(TestCase):
                 "content": "Noi dung bai viet",
                 "author_name": "Sensei Hana",
                 "categories": [category.id],
+                "status": Post.STATUS_PUBLISHED,
                 "featured": "on",
                 "thumbnail": SimpleUploadedFile("post.gif", TEST_GIF_BYTES, content_type="image/gif"),
             },
@@ -173,6 +175,7 @@ class ResourceAdminTests(TestCase):
         post = Post.objects.get(slug="hoc-ngu-phap")
         self.assertEqual(str(post.author), "Sensei Hana")
         self.assertEqual(post.author.display_name, "Sensei Hana")
+        self.assertEqual(post.status, Post.STATUS_PUBLISHED)
 
     def test_database_page_post_table_has_edit_delete_actions(self):
         self.client.login(username="staffuser", password="strong-password-123")
@@ -196,8 +199,205 @@ class ResourceAdminTests(TestCase):
         response = self.client.get(reverse("resource_admin_database"))
 
         self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("post", args=[post.slug]))
+        self.assertContains(response, "Published")
+        self.assertContains(response, reverse("post_duplicate", args=[post.id]))
         self.assertContains(response, reverse("post_update", args=[post.id]))
         self.assertContains(response, reverse("post_delete", args=[post.id]))
+        self.assertContains(response, "Categories")
+
+    def test_database_page_can_filter_posts_by_category_and_author_name(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        learn_category = Category.objects.create(
+            title="Learn Nihongo",
+            subtitle="Study",
+            slug="learn-nihongo",
+            thumbnail=SimpleUploadedFile("learn-category.gif", TEST_GIF_BYTES, content_type="image/gif"),
+        )
+        review_category = Category.objects.create(
+            title="Reviews",
+            subtitle="Review",
+            slug="reviews",
+            thumbnail=SimpleUploadedFile("review-category.gif", TEST_GIF_BYTES, content_type="image/gif"),
+        )
+        typed_author = Author.objects.create(
+            user=User.objects.create_user(username="sensei-hana"),
+            display_name="Sensei Hana",
+        )
+        matching_post = Post.objects.create(
+            title="Ngu phap N5",
+            slug="ngu-phap-n5",
+            overview="Tong hop ngu phap",
+            content="Hoc voi Sensei Hana",
+            author=typed_author,
+            thumbnail=SimpleUploadedFile("post-1.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=True,
+        )
+        matching_post.categories.add(learn_category)
+        other_post = Post.objects.create(
+            title="May tinh",
+            slug="may-tinh",
+            overview="Review laptop",
+            content="Noi dung review",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("post-2.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+        )
+        other_post.categories.add(review_category)
+
+        response = self.client.get(
+            reverse("resource_admin_database"),
+            {"q": "Sensei Hana", "category": learn_category.id, "featured": "yes"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Ngu phap N5")
+        self.assertNotContains(response, "May tinh")
+
+    def test_database_page_can_filter_posts_by_status(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        published_post = Post.objects.create(
+            title="Published post",
+            slug="published-post",
+            overview="Mo ta",
+            content="Noi dung",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("published.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+            status=Post.STATUS_PUBLISHED,
+        )
+        draft_post = Post.objects.create(
+            title="Draft post",
+            slug="draft-post",
+            overview="Mo ta",
+            content="Noi dung",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("draft.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+            status=Post.STATUS_DRAFT,
+        )
+
+        response = self.client.get(reverse("resource_admin_database"), {"status": Post.STATUS_DRAFT})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, draft_post.title)
+        self.assertNotContains(response, published_post.title)
+
+    def test_database_page_can_paginate_and_sort_posts(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        for index in range(12):
+            Post.objects.create(
+                title=f"Post {index:02d}",
+                slug=f"post-{index:02d}",
+                overview="Mo ta",
+                content="Noi dung",
+                author=self.author,
+                thumbnail=SimpleUploadedFile(f"thumb-{index}.gif", TEST_GIF_BYTES, content_type="image/gif"),
+                featured=False,
+            )
+
+        response = self.client.get(reverse("resource_admin_database"), {"sort": "title", "page": 2})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Page 2 / 2")
+        self.assertContains(response, "Post 10")
+        self.assertContains(response, "Post 11")
+        self.assertNotContains(response, "Post 00")
+
+    def test_database_page_can_paginate_comments(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        post = Post.objects.create(
+            title="Post with comments",
+            slug="post-with-comments",
+            overview="Mo ta",
+            content="Noi dung",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("comments.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=False,
+        )
+        for index in range(12):
+            post.comments.create(author_name=f"Guest {index:02d}", body="Binh luan")
+
+        response = self.client.get(reverse("resource_admin_database"), {"comment_page": 2})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Page 2 / 2")
+        self.assertContains(response, "Guest 01")
+        self.assertContains(response, "Guest 00")
+        self.assertNotContains(response, "Guest 11")
+
+    def test_duplicate_post_creates_draft_copy(self):
+        self.client.login(username="staffuser", password="strong-password-123")
+        category = Category.objects.create(
+            title="Learn",
+            subtitle="Study notes",
+            slug="learn",
+            thumbnail=SimpleUploadedFile("learn2.gif", TEST_GIF_BYTES, content_type="image/gif"),
+        )
+        source_post = Post.objects.create(
+            title="Original post",
+            slug="original-post",
+            overview="Mo ta",
+            content="Noi dung",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("original.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=True,
+            status=Post.STATUS_PUBLISHED,
+        )
+        source_post.categories.add(category)
+
+        response = self.client.get(reverse("post_duplicate", args=[source_post.id]))
+
+        self.assertEqual(response.status_code, 302)
+        duplicated_post = Post.objects.exclude(pk=source_post.pk).get()
+        self.assertEqual(duplicated_post.status, Post.STATUS_DRAFT)
+        self.assertTrue(duplicated_post.slug.startswith("original-post-copy"))
+        self.assertEqual(list(duplicated_post.categories.all()), [category])
+
+    def test_public_pages_only_show_published_posts(self):
+        category = Category.objects.create(
+            title="Learn Nihongo",
+            subtitle="Study",
+            slug="learn-nihongo",
+            thumbnail=SimpleUploadedFile("learn-public.gif", TEST_GIF_BYTES, content_type="image/gif"),
+        )
+        published_post = Post.objects.create(
+            title="Published title",
+            slug="published-title",
+            overview="Mo ta",
+            content="Noi dung",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("published-public.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=True,
+            status=Post.STATUS_PUBLISHED,
+        )
+        published_post.categories.add(category)
+        draft_post = Post.objects.create(
+            title="Draft title",
+            slug="draft-title",
+            overview="Mo ta nhap",
+            content="Noi dung nhap",
+            author=self.author,
+            thumbnail=SimpleUploadedFile("draft-public.gif", TEST_GIF_BYTES, content_type="image/gif"),
+            featured=True,
+            status=Post.STATUS_DRAFT,
+        )
+        draft_post.categories.add(category)
+
+        homepage_response = self.client.get(reverse("homepage"))
+        allposts_response = self.client.get(reverse("allposts"))
+        postlist_response = self.client.get(reverse("postlist", args=[category.slug]))
+        post_response = self.client.get(reverse("post", args=[published_post.slug]))
+        draft_post_response = self.client.get(reverse("post", args=[draft_post.slug]))
+
+        self.assertContains(homepage_response, published_post.title)
+        self.assertNotContains(homepage_response, draft_post.title)
+        self.assertContains(allposts_response, published_post.title)
+        self.assertNotContains(allposts_response, draft_post.title)
+        self.assertContains(postlist_response, published_post.title)
+        self.assertNotContains(postlist_response, draft_post.title)
+        self.assertEqual(post_response.status_code, 200)
+        self.assertEqual(draft_post_response.status_code, 404)
 
     def test_post_form_rejects_duplicate_slug(self):
         self.client.login(username="staffuser", password="strong-password-123")
@@ -226,6 +426,7 @@ class ResourceAdminTests(TestCase):
                 "content": "Noi dung moi",
                 "author_name": "Sensei Hana",
                 "categories": [category.id],
+                "status": Post.STATUS_PUBLISHED,
                 "thumbnail": SimpleUploadedFile("thumb-new.gif", TEST_GIF_BYTES, content_type="image/gif"),
             },
         )

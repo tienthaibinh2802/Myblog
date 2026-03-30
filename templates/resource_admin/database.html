@@ -10,7 +10,7 @@
     This page shows the current data in the system, so you can review everything without opening the SQL file.
   </p>
 
-  <form method="get" class="mt-6 grid gap-4 md:grid-cols-[2fr_1fr_auto]">
+  <form method="get" class="mt-6 grid gap-4 lg:grid-cols-2">
     <input type="text" name="q" value="{{ query }}" placeholder="Search title, note, slug, author..." class="w-full rounded-2xl border border-slate-300 px-4 py-3">
     <select name="section" class="w-full rounded-2xl border border-slate-300 px-4 py-3">
       <option value="">All resource sections</option>
@@ -18,9 +18,30 @@
       <option value="{{ option.id }}" {% if selected_section == option.id|stringformat:"s" %}selected{% endif %}>{{ option.title }}</option>
       {% endfor %}
     </select>
+    <select name="category" class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+      <option value="">All post categories</option>
+      {% for option in all_categories %}
+      <option value="{{ option.id }}" {% if selected_category == option.id|stringformat:"s" %}selected{% endif %}>{{ option.title }}</option>
+      {% endfor %}
+    </select>
+    <select name="featured" class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+      <option value="">All post types</option>
+      <option value="yes" {% if featured_filter == "yes" %}selected{% endif %}>Featured only</option>
+      <option value="no" {% if featured_filter == "no" %}selected{% endif %}>Non-featured only</option>
+    </select>
+    <select name="status" class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+      {% for option in status_options %}
+      <option value="{{ option.value }}" {% if status_filter == option.value %}selected{% endif %}>{{ option.label }}</option>
+      {% endfor %}
+    </select>
+    <select name="sort" class="w-full rounded-2xl border border-slate-300 px-4 py-3">
+      {% for option in sort_options %}
+      <option value="{{ option.value }}" {% if sort == option.value %}selected{% endif %}>{{ option.label }}</option>
+      {% endfor %}
+    </select>
     <div class="flex gap-3">
       <button type="submit" class="rounded-2xl bg-slate-900 px-5 py-3 text-white">Filter</button>
-      <a href="{% url 'resource_admin_database' %}" class="rounded-2xl border border-slate-300 px-5 py-3">Reset</a>
+      <a href="{% url 'resource_admin_database' %}#post-table" class="rounded-2xl border border-slate-300 px-5 py-3">Reset</a>
     </div>
   </form>
 </section>
@@ -170,7 +191,17 @@
 
   <article id="post-table" class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
     <div class="border-b border-slate-200 px-8 py-5">
-      <h2 class="text-2xl font-semibold text-slate-900">Post</h2>
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold text-slate-900">Post</h2>
+          <p class="mt-1 text-sm text-slate-500">
+            {{ posts.paginator.count }} post{{ posts.paginator.count|pluralize }} found.
+          </p>
+        </div>
+        <p class="text-sm text-slate-500">
+          Page {{ posts.number }} / {{ posts.paginator.num_pages }}
+        </p>
+      </div>
     </div>
     <div class="overflow-x-auto">
       <table class="min-w-full text-left text-sm">
@@ -180,6 +211,8 @@
             <th class="px-6 py-4">Title</th>
             <th class="px-6 py-4">Slug</th>
             <th class="px-6 py-4">Author</th>
+            <th class="px-6 py-4">Categories</th>
+            <th class="px-6 py-4">Status</th>
             <th class="px-6 py-4">Featured</th>
             <th class="px-6 py-4">Time</th>
             <th class="px-6 py-4">Action</th>
@@ -192,26 +225,92 @@
             <td class="px-6 py-4 font-medium text-slate-900">{{ post.title }}</td>
             <td class="px-6 py-4">{{ post.slug }}</td>
             <td class="px-6 py-4">{{ post.author }}</td>
+            <td class="px-6 py-4">
+              {% for category in post.categories.all %}
+              <span class="mb-1 mr-1 inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs text-slate-600">{{ category.title }}</span>
+              {% empty %}
+              -
+              {% endfor %}
+            </td>
+            <td class="px-6 py-4">
+              {% if post.status == "published" %}
+              <span class="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Published</span>
+              {% else %}
+              <span class="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-medium text-amber-700">Draft</span>
+              {% endif %}
+            </td>
             <td class="px-6 py-4">{% if post.featured %}Yes{% else %}No{% endif %}</td>
             <td class="px-6 py-4">{{ post.timestamp }}</td>
             <td class="px-6 py-4">
               <div class="flex gap-3">
+                {% if post.status == "published" %}
+                <a href="{% url 'post' post.slug %}" target="_blank" rel="noopener noreferrer" class="text-sky-700 hover:text-sky-900">View</a>
+                {% else %}
+                <span class="text-slate-400">Draft</span>
+                {% endif %}
+                <a href="{% url 'post_duplicate' post.id %}" class="text-violet-700 hover:text-violet-900">Duplicate</a>
                 <a href="{% url 'post_update' post.id %}" class="text-slate-700 hover:text-slate-900">Edit</a>
                 <a href="{% url 'post_delete' post.id %}" class="text-rose-600 hover:text-rose-700">Delete</a>
               </div>
             </td>
           </tr>
           {% empty %}
-          <tr><td colspan="7" class="px-6 py-6 text-slate-500">No data found.</td></tr>
+          <tr><td colspan="9" class="px-6 py-6 text-slate-500">No data found.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+    {% if posts.paginator.num_pages > 1 %}
+    <div class="border-t border-slate-200 px-8 py-5">
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        {% if posts.has_previous %}
+        <a href="?q={{ query|urlencode }}&section={{ selected_section|urlencode }}&category={{ selected_category|urlencode }}&featured={{ featured_filter|urlencode }}&status={{ status_filter|urlencode }}&sort={{ sort|urlencode }}&comment_sort={{ comment_sort|urlencode }}&page={{ posts.previous_page_number }}#post-table" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">Previous</a>
+        {% endif %}
+
+        {% for page_num in posts.paginator.page_range %}
+          {% if page_num == posts.number %}
+          <span class="rounded-full bg-slate-900 px-4 py-2 text-white">{{ page_num }}</span>
+          {% elif page_num >= posts.number|add:"-2" and page_num <= posts.number|add:"2" %}
+          <a href="?q={{ query|urlencode }}&section={{ selected_section|urlencode }}&category={{ selected_category|urlencode }}&featured={{ featured_filter|urlencode }}&status={{ status_filter|urlencode }}&sort={{ sort|urlencode }}&comment_sort={{ comment_sort|urlencode }}&page={{ page_num }}#post-table" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">{{ page_num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if posts.has_next %}
+        <a href="?q={{ query|urlencode }}&section={{ selected_section|urlencode }}&category={{ selected_category|urlencode }}&featured={{ featured_filter|urlencode }}&status={{ status_filter|urlencode }}&sort={{ sort|urlencode }}&comment_sort={{ comment_sort|urlencode }}&page={{ posts.next_page_number }}#post-table" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">Next</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
   </article>
 
   <article class="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
     <div class="border-b border-slate-200 px-8 py-5">
-      <h2 class="text-2xl font-semibold text-slate-900">Comment</h2>
+      <div class="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 class="text-2xl font-semibold text-slate-900">Comment</h2>
+          <p class="mt-1 text-sm text-slate-500">
+            {{ comments.paginator.count }} comment{{ comments.paginator.count|pluralize }} found.
+          </p>
+        </div>
+        <div class="flex flex-col gap-3 md:flex-row md:items-center">
+          <form method="get" class="flex flex-wrap gap-3">
+            <input type="hidden" name="q" value="{{ query }}">
+            <input type="hidden" name="section" value="{{ selected_section }}">
+            <input type="hidden" name="category" value="{{ selected_category }}">
+            <input type="hidden" name="featured" value="{{ featured_filter }}">
+            <input type="hidden" name="status" value="{{ status_filter }}">
+            <input type="hidden" name="sort" value="{{ sort }}">
+            <input type="hidden" name="page" value="{{ posts.number }}">
+            <select name="comment_sort" class="rounded-2xl border border-slate-300 px-4 py-2 text-sm">
+              {% for option in comment_sort_options %}
+              <option value="{{ option.value }}" {% if comment_sort == option.value %}selected{% endif %}>{{ option.label }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="rounded-2xl border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">Sort comments</button>
+          </form>
+          <p class="text-sm text-slate-500">Page {{ comments.number }} / {{ comments.paginator.num_pages }}</p>
+        </div>
+      </div>
     </div>
     <div class="overflow-x-auto">
       <table class="min-w-full text-left text-sm">
@@ -239,6 +338,25 @@
         </tbody>
       </table>
     </div>
+    {% if comments.paginator.num_pages > 1 %}
+    <div class="border-t border-slate-200 px-8 py-5">
+      <div class="flex flex-wrap items-center gap-3 text-sm">
+        {% if comments.has_previous %}
+        <a href="?q={{ query|urlencode }}&section={{ selected_section|urlencode }}&category={{ selected_category|urlencode }}&featured={{ featured_filter|urlencode }}&status={{ status_filter|urlencode }}&sort={{ sort|urlencode }}&comment_sort={{ comment_sort|urlencode }}&page={{ posts.number }}&comment_page={{ comments.previous_page_number }}" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">Previous</a>
+        {% endif %}
+        {% for page_num in comments.paginator.page_range %}
+          {% if page_num == comments.number %}
+          <span class="rounded-full bg-slate-900 px-4 py-2 text-white">{{ page_num }}</span>
+          {% elif page_num >= comments.number|add:"-2" and page_num <= comments.number|add:"2" %}
+          <a href="?q={{ query|urlencode }}&section={{ selected_section|urlencode }}&category={{ selected_category|urlencode }}&featured={{ featured_filter|urlencode }}&status={{ status_filter|urlencode }}&sort={{ sort|urlencode }}&comment_sort={{ comment_sort|urlencode }}&page={{ posts.number }}&comment_page={{ page_num }}" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">{{ page_num }}</a>
+          {% endif %}
+        {% endfor %}
+        {% if comments.has_next %}
+        <a href="?q={{ query|urlencode }}&section={{ selected_section|urlencode }}&category={{ selected_category|urlencode }}&featured={{ featured_filter|urlencode }}&status={{ status_filter|urlencode }}&sort={{ sort|urlencode }}&comment_sort={{ comment_sort|urlencode }}&page={{ posts.number }}&comment_page={{ comments.next_page_number }}" class="rounded-full border border-slate-300 px-4 py-2 text-slate-700 hover:bg-slate-50">Next</a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
   </article>
 </section>
 {% endblock content %}

@@ -87,13 +87,14 @@ class PostForm(forms.ModelForm):
 
     class Meta:
         model = Post
-        fields = ["title", "slug", "overview", "content", "thumbnail", "categories", "featured"]
+        fields = ["title", "slug", "overview", "content", "thumbnail", "categories", "status", "featured"]
         widgets = {
             "title": forms.TextInput(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
             "slug": forms.TextInput(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
             "overview": forms.Textarea(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3 min-h-[120px]"}),
             "content": forms.Textarea(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3 min-h-[240px]"}),
             "thumbnail": forms.ClearableFileInput(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
+            "status": forms.Select(attrs={"class": "w-full rounded-xl border border-slate-300 px-4 py-3"}),
             "featured": forms.CheckboxInput(attrs={"class": "h-5 w-5 rounded border-slate-300 text-pink-500 focus:ring-pink-500"}),
         }
 
