@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}My Blog{% endblock title %}</title>
   <link rel="icon" type="image/svg+xml" href="{% static 'heart-favicon.svg' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap&subset=vietnamese" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -35,6 +38,17 @@
   </script>
   <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <style>
+    :root {
+      --font-ui: "Noto Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+    html,
+    body {
+      font-family: var(--font-ui);
+      font-synthesis-weight: none;
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
     .flower-overlay {
       pointer-events: none;
       position: fixed;

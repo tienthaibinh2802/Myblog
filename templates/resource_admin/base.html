@@ -5,8 +5,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/svg+xml" href="{% static 'heart-favicon.svg' %}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700;800&display=swap&subset=vietnamese" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>{% block title %}Resource Manager{% endblock title %}</title>
+    <style>
+      :root {
+        --font-ui: "Noto Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      html,
+      body {
+        font-family: var(--font-ui);
+        font-synthesis-weight: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+    </style>
   </head>
   <body class="min-h-screen bg-slate-100 text-slate-800">
     <header class="border-b border-slate-200 bg-white">
