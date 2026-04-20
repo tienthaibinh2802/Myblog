@@ -174,6 +174,17 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media_cdn")
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+USE_SUPABASE_STORAGE = all(
+    [
+        os.getenv("SUPABASE_URL", "").strip(),
+        os.getenv("SUPABASE_SERVICE_ROLE_KEY", "").strip(),
+        os.getenv("SUPABASE_STORAGE_BUCKET", "").strip(),
+    ]
+)
+
+if USE_SUPABASE_STORAGE:
+    DEFAULT_FILE_STORAGE = "posts.storage_backends.SupabaseStorage"
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
